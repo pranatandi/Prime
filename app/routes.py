@@ -2,6 +2,7 @@
 Flask routes for the palm fruit weighing system.
 Implements the complete workflow from DO scanning to slip generation.
 """
+import json
 from flask import render_template, request, jsonify, redirect, url_for
 from app import app, db
 from app.models import DONumber, WeighingTransaction, Deduction, AuditLog, WeighingStatus
@@ -318,10 +319,10 @@ def record_tare_weight(transaction_id):
             transaction.id,
             'weights_calculated',
             None,
-            {
+            json.dumps({
                 'net_weight': transaction.net_weight,
                 'net_after_deduction': transaction.net_after_deduction
-            },
+            }),
             f'Net: {transaction.net_weight} kg, Final: {transaction.net_after_deduction} kg',
             data.get('operator', 'system')
         )

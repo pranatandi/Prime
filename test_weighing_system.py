@@ -3,12 +3,7 @@ Unit tests for the Palm Fruit Weighing System.
 Tests models, calculations, and workflow logic.
 """
 import unittest
-import sys
-import os
 from datetime import datetime
-
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import app, db
 from app.models import DONumber, WeighingTransaction, Deduction, WeighingStatus
@@ -139,6 +134,27 @@ class TestModels(unittest.TestCase):
             
             # net_after_deduction = net - deduction = 17000 - 200 = 16800
             self.assertEqual(txn.net_after_deduction, 16800.0)
+    
+    def test_invalid_tare_weight(self):
+        """Test that tare weight cannot exceed gross weight"""
+        with app.app_context():
+            # Create DO and transaction
+            do = DONumber(do_number='TEST-005')
+            db.session.add(do)
+            db.session.commit()
+            
+            txn = WeighingTransaction(
+                do_number_id=do.id,
+                gross_weight=8000.0,
+                tare_weight=10000.0  # Invalid: tare > gross
+            )
+            db.session.add(txn)
+            
+            # Should raise ValueError
+            with self.assertRaises(ValueError) as context:
+                txn.calculate_weights()
+            
+            self.assertIn('cannot be greater than', str(context.exception))
 
 
 class TestAPI(unittest.TestCase):

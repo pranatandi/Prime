@@ -3,6 +3,7 @@ Serial port communication module for digital scale indicator.
 Supports both real hardware via USB/Serial and mock mode for testing.
 """
 import os
+import re
 import serial
 import time
 import random
@@ -122,8 +123,6 @@ class ScaleReader:
         Parse weight value from scale response string.
         Handles various common formats.
         """
-        import re
-        
         # Remove common prefixes and suffixes
         response = response.replace('ST,GS,', '')
         response = response.replace('WT:', '')

@@ -80,8 +80,16 @@ class WeighingTransaction(db.Model):
     def calculate_weights(self):
         """Calculate net weight and net after deduction"""
         if self.gross_weight is not None and self.tare_weight is not None:
+            # Validate that gross weight is greater than tare weight
+            if self.tare_weight > self.gross_weight:
+                raise ValueError(f"Tare weight ({self.tare_weight} kg) cannot be greater than gross weight ({self.gross_weight} kg)")
+            
             self.net_weight = self.gross_weight - self.tare_weight
             self.net_after_deduction = self.net_weight - (self.total_deduction or 0.0)
+            
+            # Validate that final weight is not negative
+            if self.net_after_deduction < 0:
+                raise ValueError(f"Net weight after deduction ({self.net_after_deduction} kg) cannot be negative")
     
     def to_dict(self):
         return {
