@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\Auditable;
 
 class Weighing extends Model
 {
-    use Auditable;
+    use HasFactory, Auditable;
 
     protected $table = 'weighing_transactions';
 
@@ -45,5 +46,10 @@ class Weighing extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getWeighingTimeAttribute()
+    {
+        return $this->weighing_datetime;
     }
 }
