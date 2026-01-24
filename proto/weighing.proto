@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package weighing;
+
+// Weighing Scale Service
+service WeighingScaleService {
+    // Get current weight from scale
+    rpc GetWeight(WeightRequest) returns (WeightResponse);
+    
+    // Stream continuous weight readings
+    rpc StreamWeight(WeightRequest) returns (stream WeightResponse);
+    
+    // Tare/Zero the scale
+    rpc TareScale(TareRequest) returns (TareResponse);
+    
+    // Check scale health/connection
+    rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+// Weighing Transaction Service (for microservices communication)
+service WeighingTransactionService {
+    // Create new weighing transaction
+    rpc CreateTransaction(TransactionRequest) returns (TransactionResponse);
+    
+    // Get transaction by ID
+    rpc GetTransaction(GetTransactionRequest) returns (TransactionResponse);
+    
+    // List transactions with filters
+    rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse);
+    
+    // Update transaction
+    rpc UpdateTransaction(UpdateTransactionRequest) returns (TransactionResponse);
+}
+
+// Weight Request
+message WeightRequest {
+    string scale_id = 1;
+    string unit = 2;
+}
+
+// Weight Response
+message WeightResponse {
+    double weight = 1;
+    string unit = 2;
+    string status = 3;
+    int64 timestamp = 4;
+    string scale_id = 5;
+}
+
+// Tare Request
+message TareRequest {
+    string scale_id = 1;
+}
+
+// Tare Response
+message TareResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// Health Check Request
+message HealthCheckRequest {
+    string scale_id = 1;
+}
+
+// Health Check Response
+message HealthCheckResponse {
+    bool is_connected = 1;
+    string status = 2;
+    string scale_model = 3;
+    string firmware_version = 4;
+}
+
+// Transaction Request
+message TransactionRequest {
+    string transaction_code = 1;
+    int64 supplier_id = 2;
+    int64 vehicle_id = 3;
+    string vehicle_plate_number = 4;
+    double gross_weight = 5;
+    double tare_weight = 6;
+    double net_weight = 7;
+    int64 weighing_timestamp = 8;
+    string vehicle_photo = 9;
+    string notes = 10;
+    int64 user_id = 11;
+}
+
+// Transaction Response
+message TransactionResponse {
+    int64 id = 1;
+    string transaction_code = 2;
+    int64 supplier_id = 3;
+    int64 vehicle_id = 4;
+    string vehicle_plate_number = 5;
+    double gross_weight = 6;
+    double tare_weight = 7;
+    double net_weight = 8;
+    int64 weighing_timestamp = 9;
+    string vehicle_photo = 10;
+    string notes = 11;
+    int64 user_id = 12;
+    int64 created_at = 13;
+    int64 updated_at = 14;
+}
+
+// Get Transaction Request
+message GetTransactionRequest {
+    int64 id = 1;
+}
+
+// List Transactions Request
+message ListTransactionsRequest {
+    int32 page = 1;
+    int32 per_page = 2;
+    string date_from = 3;
+    string date_to = 4;
+    int64 supplier_id = 5;
+    int64 vehicle_id = 6;
+}
+
+// List Transactions Response
+message ListTransactionsResponse {
+    repeated TransactionResponse transactions = 1;
+    int32 total = 2;
+    int32 page = 3;
+    int32 per_page = 4;
+}
+
+// Update Transaction Request
+message UpdateTransactionRequest {
+    int64 id = 1;
+    TransactionRequest transaction = 2;
+}
