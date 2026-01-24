@@ -1,59 +1,326 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Prime - Palm Fruit Weighing System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern, Progressive Web App (PWA) for managing palm fruit weighing operations built with Laravel framework, featuring gRPC integration, comprehensive audit trails, and offline capabilities.
 
-## About Laravel
+## 🌟 Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Core Features
+- **Weighing Management**: Complete CRUD operations for weighing transactions with auto-calculation of net weight
+- **Master Data Management**: Suppliers, vehicles, and user management with role-based access
+- **Dashboard & Reporting**: Real-time statistics, charts, and export to Excel
+- **Audit Trail System**: Comprehensive activity logging powered by Spatie Activity Log
+- **Multi-language Support**: English and Bahasa Indonesia
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Technical Features
+- **Progressive Web App (PWA)**: 
+  - Offline capability with service worker
+  - Installable on mobile and desktop
+  - Push notifications support
+  - Background sync for offline transactions
+- **gRPC Integration**: Ready for communication with weighing scale devices and microservices
+- **Security**: CSRF protection, SQL injection prevention, XSS protection, rate limiting
+- **Modern UI**: Responsive design (mobile & desktop ready)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📋 Requirements
 
-## Learning Laravel
+- PHP 8.2 or higher
+- Composer
+- Node.js & NPM
+- MySQL 5.7+ / PostgreSQL 12+ / SQLite
+- Redis (optional, for caching and queues)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🚀 Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Clone the Repository
+```bash
+git clone https://github.com/pranatandi/Prime.git
+cd Prime
+```
 
-## Laravel Sponsors
+### 2. Install Dependencies
+```bash
+# Install PHP dependencies
+composer install
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Install JavaScript dependencies
+npm install
+```
 
-### Premium Partners
+### 3. Environment Configuration
+```bash
+# Copy environment file
+cp .env.example .env
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Generate application key
+php artisan key:generate
 
-## Contributing
+# Configure your database in .env
+# For MySQL:
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=prime_weighing
+DB_USERNAME=root
+DB_PASSWORD=your_password
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4. Database Setup
+```bash
+# Run migrations
+php artisan migrate
 
-## Code of Conduct
+# Seed database with sample data
+php artisan db:seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 5. Storage Setup
+```bash
+# Create storage link for file uploads
+php artisan storage:link
+```
 
-## Security Vulnerabilities
+### 6. Publish Package Assets
+```bash
+# Publish activity log migrations and config
+php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-migrations"
+php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-config"
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Publish Excel config (optional)
+php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider" --tag="config"
+```
 
-## License
+### 7. Build Assets
+```bash
+# Development
+npm run dev
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Production
+npm run build
+```
+
+### 8. Start the Application
+```bash
+# Start Laravel development server
+php artisan serve
+
+# Or use Laravel Sail (Docker)
+./vendor/bin/sail up
+```
+
+Visit: `http://localhost:8000`
+
+## 👤 Default Users
+
+After seeding, you can login with these credentials:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@prime.com | password |
+| Operator | operator@prime.com | password |
+| Viewer | viewer@prime.com | password |
+
+## 📁 Project Structure
+
+```
+prime/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── DashboardController.php
+│   │   ├── WeighingController.php
+│   │   ├── SupplierController.php
+│   │   └── VehicleController.php
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Weighing.php
+│   │   ├── Supplier.php
+│   │   └── Vehicle.php
+│   ├── Services/
+│   │   ├── GrpcService.php
+│   │   └── ReportService.php
+│   └── Traits/
+│       └── Auditable.php
+├── database/
+│   ├── migrations/
+│   └── seeders/
+├── public/
+│   ├── manifest.json          # PWA manifest
+│   ├── sw.js                  # Service Worker
+│   ├── offline.html           # Offline fallback page
+│   └── icons/                 # PWA icons
+├── proto/
+│   └── weighing.proto         # gRPC protocol definitions
+├── resources/
+│   ├── views/
+│   └── js/
+│       └── pwa.js            # PWA registration script
+└── routes/
+    ├── web.php
+    └── api.php
+```
+
+## 🔧 Configuration
+
+### Database
+Edit `.env` file to configure your database connection:
+- MySQL/MariaDB (recommended for production)
+- PostgreSQL
+- SQLite (good for development)
+
+### gRPC
+Configure gRPC endpoints in `.env`:
+```env
+GRPC_SERVER_HOST=0.0.0.0
+GRPC_SERVER_PORT=50051
+GRPC_SCALE_ENDPOINT=127.0.0.1:50052
+```
+
+### PWA
+Enable/disable PWA features in `.env`:
+```env
+PWA_ENABLED=true
+```
+
+### Activity Logs
+Configure audit trail retention:
+```env
+ACTIVITY_LOG_ENABLED=true
+ACTIVITY_LOG_DELETE_RECORDS_OLDER_THAN_DAYS=365
+```
+
+## 📱 PWA Features
+
+### Installation
+Users can install the app on their devices:
+- **Desktop**: Click the install button in the address bar
+- **Mobile**: Add to Home Screen from browser menu
+
+### Offline Mode
+- Static assets are cached for offline access
+- Recent weighing data can be viewed offline
+- Transactions made offline are synced when connection is restored
+
+### Push Notifications
+Enable notifications to receive alerts for:
+- New weighing transactions
+- System alerts
+- Daily reports
+
+## 🔐 Security Features
+
+- **Authentication**: Laravel Sanctum/Breeze ready
+- **Authorization**: Role-based access control (Admin, Operator, Viewer)
+- **CSRF Protection**: All forms are CSRF protected
+- **SQL Injection Prevention**: Using Eloquent ORM and prepared statements
+- **XSS Protection**: Input sanitization and output escaping
+- **Rate Limiting**: Configurable per-minute request limits
+- **Audit Trail**: All user activities are logged
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+php artisan test
+
+# Run specific test suite
+php artisan test --testsuite=Feature
+
+# Run with coverage
+php artisan test --coverage
+```
+
+## 📊 Usage
+
+### Creating Weighing Transaction
+1. Navigate to Weighing → Create New
+2. Select supplier and vehicle
+3. Enter gross weight and tare weight (net weight is calculated automatically)
+4. Upload vehicle photo (optional)
+5. Add notes if needed
+6. Save transaction
+
+### Viewing Reports
+1. Go to Dashboard
+2. View daily/monthly statistics
+3. Export reports to Excel or PDF
+4. Filter by date range, supplier, or vehicle
+
+### Managing Master Data
+- **Suppliers**: Add/edit supplier information
+- **Vehicles**: Register and manage vehicles
+- **Users**: Manage user accounts and roles (Admin only)
+
+## 🛠 Development
+
+### Code Standards
+This project follows PSR-12 coding standards.
+
+### Running Linter
+```bash
+# Check code style
+./vendor/bin/pint --test
+
+# Fix code style
+./vendor/bin/pint
+```
+
+### Queue Workers
+For background jobs:
+```bash
+php artisan queue:work
+```
+
+## 🌐 Localization
+
+Add new languages:
+1. Create language files in `resources/lang/`
+2. Update `SUPPORTED_LOCALES` in `.env`
+3. Translate strings in views and controllers
+
+## 📦 Deployment
+
+### Production Checklist
+- [ ] Set `APP_ENV=production` in `.env`
+- [ ] Set `APP_DEBUG=false` in `.env`
+- [ ] Configure proper database credentials
+- [ ] Run `php artisan config:cache`
+- [ ] Run `php artisan route:cache`
+- [ ] Run `php artisan view:cache`
+- [ ] Set up queue worker as system service
+- [ ] Configure SSL certificate
+- [ ] Set up automated backups
+- [ ] Configure proper file permissions
+
+### Server Requirements
+- PHP-FPM or PHP with Apache/Nginx
+- MySQL/PostgreSQL database server
+- Redis (recommended for caching and queues)
+- Supervisor for queue workers
+- SSL certificate for HTTPS (required for PWA features)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 👨‍💻 Support
+
+For support, email support@prime.com or open an issue in the repository.
+
+## 🙏 Acknowledgments
+
+- Laravel Framework
+- Spatie Activity Log
+- Maatwebsite Excel
+- Google Protocol Buffers
+- And all other open source contributors
+
+---
+
+Made with ❤️ for the palm oil industry
