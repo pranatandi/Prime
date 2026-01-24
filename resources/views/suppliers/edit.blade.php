@@ -49,7 +49,7 @@
                     <input type="text" name="phone" id="phone" value="{{ old('phone', $supplier->phone) }}"
                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('phone') border-red-500 @enderror">
                     @error('phone')
-                        <p class="mt-1 text-sm text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
 

@@ -27,7 +27,7 @@ class WeighingFactory extends Factory
             'gross_weight' => $grossWeight,
             'tare_weight' => $tareWeight,
             'net_weight' => $netWeight,
-            'weighing_datetime' => Carbon::now(),
+            'weighing_datetime' => $this->faker->dateTimeBetween('-30 days', 'now'),
             'vehicle_photo' => null,
             'notes' => $this->faker->optional()->sentence(),
             'user_id' => User::factory(),
