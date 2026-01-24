@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Weighing Slip - Transaction #{{ transaction.id }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="margin-bottom: 5px;">🌴 WEIGHING SLIP</h1>
+        <h2 style="margin: 0;">PALM FRUIT WEIGHING SYSTEM</h2>
+    </div>
+    
+    <div style="border: 2px solid #000; padding: 20px; margin-top: 20px;">
+        <table style="width: 100%; margin: 0;">
+            <tr>
+                <td style="width: 50%; border: none;">
+                    <strong>Transaction ID:</strong>
+                </td>
+                <td style="border: none;">
+                    {{ transaction.id }}
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none;">
+                    <strong>DO Number:</strong>
+                </td>
+                <td style="border: none;">
+                    <strong style="font-size: 18px;">{{ transaction.do.do_number }}</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none;">
+                    <strong>Supplier:</strong>
+                </td>
+                <td style="border: none;">
+                    {{ transaction.do.supplier_name or '-' }}
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none;">
+                    <strong>Vehicle Number:</strong>
+                </td>
+                <td style="border: none;">
+                    {{ transaction.do.vehicle_number or '-' }}
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none;">
+                    <strong>Driver:</strong>
+                </td>
+                <td style="border: none;">
+                    {{ transaction.do.driver_name or '-' }}
+                </td>
+            </tr>
+        </table>
+        
+        <hr style="margin: 20px 0; border: 1px solid #000;">
+        
+        <table style="width: 100%; margin: 0;">
+            <tr>
+                <td style="width: 50%; border: none;">
+                    <strong>Jam Masuk (Entry Time):</strong>
+                </td>
+                <td style="border: none;">
+                    {% if transaction.gross_time %}
+                        {{ transaction.gross_time.strftime('%d-%m-%Y %H:%M:%S') }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none;">
+                    <strong>Jam Keluar (Exit Time):</strong>
+                </td>
+                <td style="border: none;">
+                    {% if transaction.tare_time %}
+                        {{ transaction.tare_time.strftime('%d-%m-%Y %H:%M:%S') }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        
+        <hr style="margin: 20px 0; border: 1px solid #000;">
+        
+        <table style="width: 100%; margin: 0; font-size: 16px;">
+            <tr>
+                <td style="width: 50%; border: none; padding: 10px 0;">
+                    <strong>Bruto (Gross Weight):</strong>
+                </td>
+                <td style="border: none; text-align: right; padding: 10px 0;">
+                    <strong>{% if transaction.gross_weight %}{{ "%.2f"|format(transaction.gross_weight) }}{% else %}0.00{% endif %} kg</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none; padding: 10px 0;">
+                    <strong>Tarra (Tare Weight):</strong>
+                </td>
+                <td style="border: none; text-align: right; padding: 10px 0;">
+                    <strong>{% if transaction.tare_weight %}{{ "%.2f"|format(transaction.tare_weight) }}{% else %}0.00{% endif %} kg</strong>
+                </td>
+            </tr>
+            <tr style="border-top: 1px solid #000;">
+                <td style="border: none; padding: 10px 0;">
+                    <strong>Netto (Net Weight):</strong>
+                </td>
+                <td style="border: none; text-align: right; padding: 10px 0;">
+                    <strong style="font-size: 18px;">{% if transaction.net_weight %}{{ "%.2f"|format(transaction.net_weight) }}{% else %}0.00{% endif %} kg</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none; padding: 10px 0;">
+                    <strong>Potongan (Deductions):</strong>
+                </td>
+                <td style="border: none; text-align: right; padding: 10px 0;">
+                    <strong>{% if transaction.total_deduction %}{{ "%.2f"|format(transaction.total_deduction) }}{% else %}0.00{% endif %} kg</strong>
+                </td>
+            </tr>
+            <tr style="border-top: 2px solid #000; background: #f0f0f0;">
+                <td style="border: none; padding: 15px 10px;">
+                    <strong style="font-size: 18px;">Netto Akhir (Final Net Weight):</strong>
+                </td>
+                <td style="border: none; text-align: right; padding: 15px 10px;">
+                    <strong style="font-size: 24px; color: #27ae60;">
+                        {% if transaction.net_after_deduction %}{{ "%.2f"|format(transaction.net_after_deduction) }}{% else %}0.00{% endif %} kg
+                    </strong>
+                </td>
+            </tr>
+        </table>
+        
+        {% if transaction.deductions %}
+        <hr style="margin: 20px 0; border: 1px solid #000;">
+        
+        <h4>Deduction Details:</h4>
+        <table style="width: 100%; margin: 10px 0; font-size: 14px;">
+            <thead>
+                <tr style="background: #f0f0f0;">
+                    <th style="padding: 8px; text-align: left;">Type</th>
+                    <th style="padding: 8px; text-align: right;">Amount (kg)</th>
+                    <th style="padding: 8px; text-align: left;">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for deduction in transaction.deductions %}
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ deduction.deduction_type }}</td>
+                    <td style="padding: 8px; text-align: right; border-bottom: 1px solid #ddd;">{{ "%.2f"|format(deduction.amount) }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ deduction.remarks or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        
+        <hr style="margin: 20px 0; border: 1px solid #000;">
+        
+        <div style="margin-top: 30px;">
+            <table style="width: 100%; margin: 0;">
+                <tr>
+                    <td style="width: 50%; text-align: center; border: none;">
+                        <div style="margin-top: 50px; border-top: 1px solid #000; padding-top: 5px; display: inline-block; min-width: 200px;">
+                            Weighing Operator
+                        </div>
+                    </td>
+                    <td style="width: 50%; text-align: center; border: none;">
+                        <div style="margin-top: 50px; border-top: 1px solid #000; padding-top: 5px; display: inline-block; min-width: 200px;">
+                            Driver Signature
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;" class="no-print">
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Print Slip</button>
+        <a href="/queue" class="btn btn-success" style="text-decoration: none;">← Back to Queue</a>
+        <button onclick="viewAuditTrail()" class="btn btn-warning">📜 View Audit Trail</button>
+    </div>
+</div>
+
+<div id="auditTrail" style="display: none;" class="no-print"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const transactionId = {{ transaction.id }};
+
+async function viewAuditTrail() {
+    const auditDiv = document.getElementById('auditTrail');
+    
+    if (auditDiv.style.display === 'block') {
+        auditDiv.style.display = 'none';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/transactions/${transactionId}`);
+        const transaction = await response.json();
+        
+        let html = '<div class="card" style="margin-top: 20px;"><h3>📜 Audit Trail</h3>';
+        
+        if (transaction.audit_logs && transaction.audit_logs.length > 0) {
+            html += '<table><thead><tr><th>Time</th><th>Action</th><th>Description</th><th>User</th></tr></thead><tbody>';
+            
+            transaction.audit_logs.forEach(log => {
+                html += `
+                    <tr>
+                        <td><small>${formatDateTime(log.created_at)}</small></td>
+                        <td><strong>${log.action}</strong></td>
+                        <td>${log.description || '-'}</td>
+                        <td>${log.created_by || '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+        } else {
+            html += '<p>No audit logs found.</p>';
+        }
+        
+        html += '</div>';
+        
+        auditDiv.innerHTML = html;
+        auditDiv.style.display = 'block';
+        
+    } catch (error) {
+        showAlert('Error loading audit trail: ' + error.message, 'error');
+    }
+}
+</script>
+{% endblock %}

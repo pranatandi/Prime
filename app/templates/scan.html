@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Scan DO Number{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📱 Scan DO Number</h2>
+    <p>Scan or enter DO Number to enqueue vehicle for weighing.</p>
+    
+    <form id="scanForm" style="margin-top: 20px;">
+        <div class="form-group">
+            <label for="do_number">DO Number:</label>
+            <input type="text" id="do_number" name="do_number" required autofocus 
+                   placeholder="Scan QR/Barcode or type DO Number">
+        </div>
+        
+        <div class="form-group">
+            <label for="operator">Operator Name:</label>
+            <input type="text" id="operator" name="operator" value="Operator" required>
+        </div>
+        
+        <button type="submit" class="btn btn-success">✓ Enqueue Vehicle</button>
+        <button type="button" onclick="createTestDO()" class="btn btn-warning">Create Test DO</button>
+    </form>
+</div>
+
+<div id="result"></div>
+
+<div class="card" style="margin-top: 20px;">
+    <h3>Recent DO Numbers</h3>
+    <div id="doList">Loading...</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Load DO numbers
+async function loadDONumbers() {
+    try {
+        const response = await fetch('/api/do-numbers');
+        const doNumbers = await response.json();
+        
+        const doList = document.getElementById('doList');
+        
+        if (doNumbers.length === 0) {
+            doList.innerHTML = '<p>No DO numbers found. Create a test DO to get started.</p>';
+            return;
+        }
+        
+        let html = '<table><thead><tr><th>DO Number</th><th>Supplier</th><th>Vehicle</th><th>Status</th></tr></thead><tbody>';
+        
+        doNumbers.forEach(do_item => {
+            html += `
+                <tr>
+                    <td><strong>${do_item.do_number}</strong></td>
+                    <td>${do_item.supplier_name || '-'}</td>
+                    <td>${do_item.vehicle_number || '-'}</td>
+                    <td><span class="status-badge ${do_item.is_active ? 'status-completed' : 'status-waiting_gross'}">${do_item.is_active ? 'Active' : 'Inactive'}</span></td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table>';
+        doList.innerHTML = html;
+        
+    } catch (error) {
+        document.getElementById('doList').innerHTML = '<p>Error loading DO numbers.</p>';
+    }
+}
+
+// Handle form submission
+document.getElementById('scanForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = {
+        do_number: formData.get('do_number'),
+        operator: formData.get('operator')
+    };
+    
+    try {
+        const response = await fetch('/api/scan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            document.getElementById('result').innerHTML = `
+                <div class="card" style="margin-top: 20px; border: 2px solid #27ae60;">
+                    <h3 style="color: #27ae60;">✅ ${result.message}</h3>
+                    <p><strong>DO Number:</strong> ${result.transaction.do_number}</p>
+                    <p><strong>Transaction ID:</strong> ${result.transaction.id}</p>
+                    <p><strong>Status:</strong> <span class="status-badge status-${result.transaction.status}">${result.transaction.status}</span></p>
+                    <p style="margin-top: 15px;">
+                        <a href="/queue" class="btn btn-primary">Go to Queue →</a>
+                    </p>
+                </div>
+            `;
+            
+            // Clear form
+            document.getElementById('do_number').value = '';
+            document.getElementById('do_number').focus();
+            
+        } else {
+            document.getElementById('result').innerHTML = `
+                <div class="alert alert-error" style="margin-top: 20px;">
+                    <strong>Error:</strong> ${result.error}
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        document.getElementById('result').innerHTML = `
+            <div class="alert alert-error" style="margin-top: 20px;">
+                <strong>Error:</strong> ${error.message}
+            </div>
+        `;
+    }
+});
+
+// Create test DO
+async function createTestDO() {
+    const doNumber = 'DO' + Date.now();
+    
+    try {
+        const response = await fetch('/api/do-numbers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                do_number: doNumber,
+                supplier_name: 'Test Supplier',
+                vehicle_number: 'B1234XYZ',
+                driver_name: 'Test Driver'
+            })
+        });
+        
+        if (response.ok) {
+            showAlert('Test DO created: ' + doNumber, 'success');
+            document.getElementById('do_number').value = doNumber;
+            loadDONumbers();
+        } else {
+            const result = await response.json();
+            showAlert('Error: ' + result.error, 'error');
+        }
+        
+    } catch (error) {
+        showAlert('Error: ' + error.message, 'error');
+    }
+}
+
+// Load DO numbers on page load
+loadDONumbers();
+</script>
+{% endblock %}
