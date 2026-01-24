@@ -196,6 +196,9 @@ class WeighingController extends Controller
 
     /**
      * Generate unique transaction code with format: WGH-YYYYMMDD-XXXX
+     * 
+     * Note: For production with high volume, consider adding a database index
+     * on transaction_code column or using database sequences for better performance.
      *
      * @return string
      */
@@ -204,8 +207,10 @@ class WeighingController extends Controller
         $date = Carbon::now()->format('Ymd');
         $prefix = "WGH-{$date}-";
 
-        // Get the last transaction code for today
-        $lastTransaction = Weighing::where('transaction_code', 'like', $prefix . '%')
+        // Get the last transaction code for today with optimized query
+        // Uses selective column retrieval for better performance
+        $lastTransaction = Weighing::select('transaction_code')
+            ->where('transaction_code', 'like', $prefix . '%')
             ->orderBy('transaction_code', 'desc')
             ->first();
 

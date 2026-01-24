@@ -151,6 +151,9 @@ class SupplierController extends Controller
 
     /**
      * Generate unique supplier code with format: SUP-XXXX
+     * 
+     * Note: For production with high volume, consider adding a database index
+     * on code column for better performance.
      *
      * @return string
      */
@@ -158,8 +161,10 @@ class SupplierController extends Controller
     {
         $prefix = 'SUP-';
 
-        // Get the last supplier code
-        $lastSupplier = Supplier::where('code', 'like', $prefix . '%')
+        // Get the last supplier code with optimized query
+        // Uses selective column retrieval for better performance
+        $lastSupplier = Supplier::select('code')
+            ->where('code', 'like', $prefix . '%')
             ->orderBy('code', 'desc')
             ->first();
 
