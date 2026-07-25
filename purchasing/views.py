@@ -3,6 +3,7 @@ from core.views import (
     GenericTenantDeleteView,
     GenericTenantListView,
     GenericTenantUpdateView,
+    TenantCSVExportView,
     TenantFormsetMixin,
 )
 from .forms import PurchaseOrderForm, PurchaseOrderItemFormSet, VendorForm
@@ -15,6 +16,7 @@ class VendorListView(GenericTenantListView):
     model = Vendor
     title = "Vendors"
     url_basename = "purchasing:vendor"
+    has_export = True
     list_fields = [("Nama", "name"), ("Kontak", "contact_person"), ("Email", "email"), ("Telepon", "phone")]
 
 
@@ -44,6 +46,7 @@ class PurchaseOrderListView(GenericTenantListView):
     model = PurchaseOrder
     title = "Purchase Orders"
     url_basename = "purchasing:purchaseorder"
+    has_export = True
     list_fields = [
         ("No. PO", "po_number"), ("Vendor", "vendor"), ("Tgl Order", "order_date"),
         ("Status", "get_status_display"), ("Total", "total"),
@@ -75,3 +78,23 @@ class PurchaseOrderDeleteView(GenericTenantDeleteView):
     model = PurchaseOrder
     title = "Purchase Order"
     url_basename = "purchasing:purchaseorder"
+
+
+# ---- CSV Export ----
+
+class VendorExportView(TenantCSVExportView):
+    model = Vendor
+    filename = "vendors"
+    export_fields = [("Nama", "name"), ("Kontak", "contact_person"), ("Email", "email"), ("Telepon", "phone")]
+
+
+class PurchaseOrderExportView(TenantCSVExportView):
+    model = PurchaseOrder
+    filename = "purchase_orders"
+    export_fields = [
+        ("No. PO", "po_number"), ("Vendor", "vendor"), ("Tgl Order", "order_date"),
+        ("Status", "get_status_display"), ("Total", "total"),
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("vendor")

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Tenant
+from .models import AuditLog, Tenant
 
 
 class TenantScopedAdmin(admin.ModelAdmin):
@@ -22,3 +22,16 @@ class TenantScopedAdmin(admin.ModelAdmin):
 class TenantAdmin(admin.ModelAdmin):
     list_display = ("name", "slug", "is_active", "created_at")
     search_fields = ("name",)
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(TenantScopedAdmin):
+    list_display = ("changed_at", "action", "model_name", "object_repr", "user", "tenant")
+    list_filter = ("tenant", "action", "model_name")
+    search_fields = ("object_repr",)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

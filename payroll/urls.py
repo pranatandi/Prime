@@ -7,6 +7,7 @@ app_name = "payroll"
 urlpatterns = [
     path("employees/", views.EmployeeListView.as_view(), name="employee_list"),
     path("employees/add/", views.EmployeeCreateView.as_view(), name="employee_create"),
+    path("employees/export/", views.EmployeeExportView.as_view(), name="employee_export"),
     path("employees/<int:pk>/edit/", views.EmployeeUpdateView.as_view(), name="employee_edit"),
     path("employees/<int:pk>/delete/", views.EmployeeDeleteView.as_view(), name="employee_delete"),
 

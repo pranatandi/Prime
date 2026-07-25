@@ -46,6 +46,12 @@ class SignupForm(UserCreationForm):
         return user
 
 
+class TenantSettingsForm(BootstrapModelForm):
+    class Meta:
+        model = Tenant
+        fields = ["name", "address", "phone"]
+
+
 class TenantUserForm(BootstrapModelForm):
     """Used by tenant admins to add/edit users within their own company."""
 

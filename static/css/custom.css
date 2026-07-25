@@ -22,8 +22,24 @@ body {
   border-radius: 0.25rem;
 }
 
+.sidebar-group-toggle {
+  cursor: pointer;
+}
+
+.sidebar-group-toggle .collapse-caret {
+  transition: transform 0.15s ease;
+}
+
+.sidebar-group-toggle.collapsed .collapse-caret {
+  transform: rotate(-90deg);
+}
+
 .main-content {
   padding: 1.5rem;
+}
+
+.breadcrumb {
+  margin-bottom: 1rem;
 }
 
 .kanban-board {

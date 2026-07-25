@@ -1,10 +1,35 @@
+import csv
+
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from core.mixins import TenantRequiredMixin
+
+SECTION_LABELS = {
+    "crm": "CRM",
+    "finance": "Finance",
+    "payroll": "Payroll",
+    "purchasing": "Purchasing",
+    "accounts": "Admin",
+    "dashboard": "Dashboard",
+}
+
+
+def _section_label(url_basename):
+    namespace = url_basename.split(":")[0] if url_basename else ""
+    return SECTION_LABELS.get(namespace, namespace.title())
+
+
+def _breadcrumbs(url_basename, title):
+    crumbs = [("Dashboard", reverse("dashboard:index"))]
+    section = _section_label(url_basename)
+    if section:
+        crumbs.append((section, None))
+    crumbs.append((title, None))
+    return crumbs
 
 
 class GenericTenantListView(TenantRequiredMixin, ListView):
@@ -12,7 +37,9 @@ class GenericTenantListView(TenantRequiredMixin, ListView):
 
     Subclasses set: model, list_fields = [(label, field_name), ...],
     url_basename = "app:model" (used to build `_create` / `_edit` / `_delete` urls),
-    title.
+    title. Set `has_export = True` to show an "Export CSV" button pointing at
+    `<url_basename>_export` (must be wired up alongside a TenantCSVExportView).
+    Set `readonly = True` to hide the Edit/Hapus action column (e.g. Audit Log).
     """
 
     template_name = "core/generic_list.html"
@@ -20,14 +47,45 @@ class GenericTenantListView(TenantRequiredMixin, ListView):
     list_fields = []
     url_basename = ""
     title = ""
+    has_export = False
+    readonly = False
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["title"] = self.title
         ctx["list_fields"] = self.list_fields
         ctx["url_basename"] = self.url_basename
-        ctx["create_url"] = reverse(f"{self.url_basename}_create") if self.url_basename else None
+        ctx["readonly"] = self.readonly
+        ctx["create_url"] = reverse(f"{self.url_basename}_create") if self.url_basename and not self.readonly else None
+        ctx["export_url"] = reverse(f"{self.url_basename}_export") if self.has_export else None
+        ctx["breadcrumbs"] = _breadcrumbs(self.url_basename, self.title)
         return ctx
+
+
+class TenantCSVExportView(TenantRequiredMixin, ListView):
+    """Streams the tenant-scoped queryset as CSV.
+
+    Subclasses set: model, export_fields = [(header, field_name), ...],
+    filename (without extension).
+    """
+
+    export_fields = []
+    filename = "export"
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = f'attachment; filename="{self.filename}.csv"'
+        writer = csv.writer(response)
+        writer.writerow([label for label, _ in self.export_fields])
+        for obj in self.get_queryset():
+            row = []
+            for _, field_name in self.export_fields:
+                value = getattr(obj, field_name, "")
+                if callable(value):
+                    value = value()
+                row.append(value)
+            writer.writerow(row)
+        return response
 
 
 class GenericTenantCreateView(TenantRequiredMixin, CreateView):
@@ -44,6 +102,7 @@ class GenericTenantCreateView(TenantRequiredMixin, CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx["title"] = f"Tambah {self.title}"
         ctx["cancel_url"] = self.get_success_url()
+        ctx["breadcrumbs"] = _breadcrumbs(self.url_basename, ctx["title"])
         return ctx
 
     def get_success_url(self):
@@ -69,6 +128,7 @@ class GenericTenantUpdateView(TenantRequiredMixin, UpdateView):
         ctx = super().get_context_data(**kwargs)
         ctx["title"] = f"Edit {self.title}"
         ctx["cancel_url"] = self.get_success_url()
+        ctx["breadcrumbs"] = _breadcrumbs(self.url_basename, ctx["title"])
         return ctx
 
     def get_success_url(self):
@@ -135,6 +195,7 @@ class GenericTenantDeleteView(TenantRequiredMixin, DeleteView):
         ctx = super().get_context_data(**kwargs)
         ctx["title"] = self.title
         ctx["cancel_url"] = self.get_success_url()
+        ctx["breadcrumbs"] = _breadcrumbs(self.url_basename, f"Hapus {self.title}")
         return ctx
 
     def get_success_url(self):

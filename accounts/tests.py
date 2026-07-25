@@ -39,3 +39,35 @@ class SignupTests(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username="another").exists())
+
+
+class TenantSettingsAccessTests(TestCase):
+    def setUp(self):
+        self.tenant = Tenant.objects.create(name="Tenant A")
+        self.admin = User.objects.create_user(
+            username="admin_a", password="pass12345", tenant=self.tenant, role=User.Role.ADMIN,
+        )
+        self.staff = User.objects.create_user(
+            username="staff_a", password="pass12345", tenant=self.tenant, role=User.Role.STAFF,
+        )
+
+    def test_admin_can_access_settings(self):
+        self.client.login(username="admin_a", password="pass12345")
+        response = self.client.get(reverse("accounts:settings"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_staff_cannot_access_settings(self):
+        self.client.login(username="staff_a", password="pass12345")
+        response = self.client.get(reverse("accounts:settings"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_admin_can_update_company_profile(self):
+        self.client.login(username="admin_a", password="pass12345")
+        response = self.client.post(reverse("accounts:settings"), {
+            "name": "Tenant A",
+            "address": "Jl. Sudirman No. 1",
+            "phone": "021-1234567",
+        })
+        self.assertEqual(response.status_code, 302)
+        self.tenant.refresh_from_db()
+        self.assertEqual(self.tenant.address, "Jl. Sudirman No. 1")

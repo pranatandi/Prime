@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Cari "{{ query }}"{% endblock %}
+{% block breadcrumb %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active">Hasil Pencarian</li>
+</ol></nav>
+{% endblock %}
+{% block content %}
+<h3 class="mb-4">Hasil pencarian untuk "{{ query }}"</h3>
+
+{% if not query %}
+<p class="text-muted">Ketik kata kunci di kotak pencarian.</p>
+{% else %}
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header">Companies ({{ companies|length }})</div>
+      <ul class="list-group list-group-flush">
+        {% for c in companies %}
+        <li class="list-group-item"><a href="{% url 'crm:company_edit' c.pk %}">{{ c.name }}</a></li>
+        {% empty %}<li class="list-group-item text-muted">Tidak ada hasil.</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="card shadow-sm">
+      <div class="card-header">Contacts ({{ contacts|length }})</div>
+      <ul class="list-group list-group-flush">
+        {% for c in contacts %}
+        <li class="list-group-item"><a href="{% url 'crm:contact_edit' c.pk %}">{{ c.full_name }}</a> <span class="text-muted small">{{ c.email }}</span></li>
+        {% empty %}<li class="list-group-item text-muted">Tidak ada hasil.</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header">Deals ({{ deals|length }})</div>
+      <ul class="list-group list-group-flush">
+        {% for d in deals %}
+        <li class="list-group-item"><a href="{% url 'crm:deal_edit' d.pk %}">{{ d.title }}</a></li>
+        {% empty %}<li class="list-group-item text-muted">Tidak ada hasil.</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="card shadow-sm">
+      <div class="card-header">Invoices ({{ invoices|length }})</div>
+      <ul class="list-group list-group-flush">
+        {% for i in invoices %}
+        <li class="list-group-item"><a href="{% url 'finance:invoice_edit' i.pk %}">{{ i.number }}</a></li>
+        {% empty %}<li class="list-group-item text-muted">Tidak ada hasil.</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

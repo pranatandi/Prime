@@ -11,6 +11,7 @@ from core.views import (
     GenericTenantDeleteView,
     GenericTenantListView,
     GenericTenantUpdateView,
+    TenantCSVExportView,
 )
 from .forms import ActivityForm, CompanyForm, ContactForm, DealForm, PipelineStageForm
 from .models import Activity, Company, Contact, Deal, PipelineStage
@@ -22,6 +23,7 @@ class CompanyListView(GenericTenantListView):
     model = Company
     title = "Companies"
     url_basename = "crm:company"
+    has_export = True
     list_fields = [("Nama", "name"), ("Industri", "industry"), ("Telepon", "phone"), ("Owner", "owner")]
 
 
@@ -51,6 +53,7 @@ class ContactListView(GenericTenantListView):
     model = Contact
     title = "Contacts"
     url_basename = "crm:contact"
+    has_export = True
     list_fields = [("Nama", "full_name"), ("Company", "company"), ("Email", "email"), ("Telepon", "phone")]
 
 
@@ -171,6 +174,7 @@ class ActivityListView(GenericTenantListView):
     model = Activity
     title = "Tasks & Activities"
     url_basename = "crm:activity"
+    has_export = True
     list_fields = [
         ("Tipe", "get_type_display"), ("Subjek", "subject"), ("Jatuh Tempo", "due_date"),
         ("Selesai?", "is_done"), ("PIC", "assigned_to"),
@@ -198,3 +202,35 @@ class ActivityDeleteView(GenericTenantDeleteView):
     model = Activity
     title = "Activity"
     url_basename = "crm:activity"
+
+
+# ---- CSV Export ----
+
+class CompanyExportView(TenantCSVExportView):
+    model = Company
+    filename = "companies"
+    export_fields = [("Nama", "name"), ("Industri", "industry"), ("Website", "website"), ("Telepon", "phone"), ("Owner", "owner")]
+
+
+class ContactExportView(TenantCSVExportView):
+    model = Contact
+    filename = "contacts"
+    export_fields = [("Nama", "full_name"), ("Company", "company"), ("Email", "email"), ("Telepon", "phone"), ("Posisi", "position")]
+
+
+class DealExportView(TenantCSVExportView):
+    model = Deal
+    filename = "deals"
+    export_fields = [
+        ("Judul", "title"), ("Company", "company"), ("Stage", "stage"), ("Nilai", "value"),
+        ("Status", "get_status_display"), ("Owner", "owner"), ("Target Closing", "expected_close_date"),
+    ]
+
+
+class ActivityExportView(TenantCSVExportView):
+    model = Activity
+    filename = "activities"
+    export_fields = [
+        ("Tipe", "get_type_display"), ("Subjek", "subject"), ("Jatuh Tempo", "due_date"),
+        ("Selesai?", "is_done"), ("PIC", "assigned_to"),
+    ]

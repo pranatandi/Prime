@@ -23,6 +23,7 @@ urlpatterns = [
     # Invoices
     path("invoices/", views.InvoiceListView.as_view(), name="invoice_list"),
     path("invoices/add/", views.InvoiceCreateView.as_view(), name="invoice_create"),
+    path("invoices/export/", views.InvoiceExportView.as_view(), name="invoice_export"),
     path("invoices/<int:pk>/edit/", views.InvoiceUpdateView.as_view(), name="invoice_edit"),
     path("invoices/<int:pk>/delete/", views.InvoiceDeleteView.as_view(), name="invoice_delete"),
     # Budgets

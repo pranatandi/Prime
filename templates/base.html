@@ -17,51 +17,131 @@
       Prime {% if user.tenant %}<span class="badge bg-primary ms-2 fs-6">{{ user.tenant.name }}</span>{% endif %}
     </a>
     <ul class="nav nav-pills flex-column mb-auto">
-      <li class="nav-item"><a href="{% url 'dashboard:index' %}" class="nav-link {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}">Dashboard</a></li>
-      <li><hr class="text-secondary"></li>
-      <li class="nav-item"><small class="text-secondary text-uppercase px-2">CRM</small></li>
-      <li class="nav-item"><a href="{% url 'crm:company_list' %}" class="nav-link {% if 'company' in request.resolver_match.url_name|default:'' %}active{% endif %}">Companies</a></li>
-      <li class="nav-item"><a href="{% url 'crm:contact_list' %}" class="nav-link {% if 'contact' in request.resolver_match.url_name|default:'' %}active{% endif %}">Contacts</a></li>
-      <li class="nav-item"><a href="{% url 'crm:deal_board' %}" class="nav-link {% if 'deal' in request.resolver_match.url_name|default:'' %}active{% endif %}">Deals / Pipeline</a></li>
-      <li class="nav-item"><a href="{% url 'crm:activity_list' %}" class="nav-link {% if 'activity' in request.resolver_match.url_name|default:'' %}active{% endif %}">Tasks &amp; Activities</a></li>
-      <li><hr class="text-secondary"></li>
-      <li class="nav-item"><small class="text-secondary text-uppercase px-2">Finance</small></li>
-      <li class="nav-item"><a href="{% url 'finance:account_list' %}" class="nav-link {% if 'account' in request.resolver_match.url_name|default:'' %}active{% endif %}">Chart of Accounts</a></li>
-      <li class="nav-item"><a href="{% url 'finance:journalentry_list' %}" class="nav-link {% if 'journalentry' in request.resolver_match.url_name|default:'' %}active{% endif %}">Journal Entries</a></li>
-      <li class="nav-item"><a href="{% url 'finance:invoice_list' %}" class="nav-link {% if 'invoice' in request.resolver_match.url_name|default:'' %}active{% endif %}">Invoices</a></li>
-      <li class="nav-item"><a href="{% url 'finance:taxrate_list' %}" class="nav-link {% if 'taxrate' in request.resolver_match.url_name|default:'' %}active{% endif %}">Tax Rates</a></li>
-      <li class="nav-item"><a href="{% url 'finance:budget_list' %}" class="nav-link {% if 'budget' in request.resolver_match.url_name|default:'' %}active{% endif %}">Budgets</a></li>
-      <li><hr class="text-secondary"></li>
-      <li class="nav-item"><small class="text-secondary text-uppercase px-2">Payroll</small></li>
-      <li class="nav-item"><a href="{% url 'payroll:employee_list' %}" class="nav-link {% if 'employee' in request.resolver_match.url_name|default:'' %}active{% endif %}">Employees</a></li>
-      <li class="nav-item"><a href="{% url 'payroll:payrollrun_list' %}" class="nav-link {% if 'payrollrun' in request.resolver_match.url_name|default:'' %}active{% endif %}">Payroll Runs</a></li>
-      <li><hr class="text-secondary"></li>
-      <li class="nav-item"><small class="text-secondary text-uppercase px-2">Purchasing</small></li>
-      <li class="nav-item"><a href="{% url 'purchasing:vendor_list' %}" class="nav-link {% if 'vendor' in request.resolver_match.url_name|default:'' %}active{% endif %}">Vendors</a></li>
-      <li class="nav-item"><a href="{% url 'purchasing:purchaseorder_list' %}" class="nav-link {% if 'purchaseorder' in request.resolver_match.url_name|default:'' %}active{% endif %}">Purchase Orders</a></li>
+      <li class="nav-item"><a href="{% url 'dashboard:index' %}" class="nav-link {% if request.resolver_match.namespace == 'dashboard' and request.resolver_match.url_name == 'index' %}active{% endif %}">Dashboard</a></li>
+
+      <li class="mt-2"><a href="#groupReports" class="sidebar-group-toggle text-secondary text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse">Reports <span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupReports">
+        <li class="nav-item"><a href="{% url 'dashboard:sales_report' %}" class="nav-link {% if request.resolver_match.url_name == 'sales_report' %}active{% endif %}">Sales Report</a></li>
+        <li class="nav-item"><a href="{% url 'dashboard:financial_report' %}" class="nav-link {% if request.resolver_match.url_name == 'financial_report' %}active{% endif %}">Financial Report</a></li>
+      </div>
+
+      <li class="mt-2"><a href="#groupCRM" class="sidebar-group-toggle text-secondary text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse">CRM <span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupCRM">
+        <li class="nav-item"><a href="{% url 'crm:company_list' %}" class="nav-link {% if 'company' in request.resolver_match.url_name|default:'' %}active{% endif %}">Companies</a></li>
+        <li class="nav-item"><a href="{% url 'crm:contact_list' %}" class="nav-link {% if 'contact' in request.resolver_match.url_name|default:'' %}active{% endif %}">Contacts</a></li>
+        <li class="nav-item"><a href="{% url 'crm:deal_board' %}" class="nav-link {% if 'deal' in request.resolver_match.url_name|default:'' %}active{% endif %}">Deals / Pipeline</a></li>
+        <li class="nav-item"><a href="{% url 'crm:activity_list' %}" class="nav-link {% if 'activity' in request.resolver_match.url_name|default:'' %}active{% endif %}">Tasks &amp; Activities</a></li>
+      </div>
+
+      <li class="mt-2"><a href="#groupFinance" class="sidebar-group-toggle text-secondary text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse">Finance <span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupFinance">
+        <li class="nav-item"><a href="{% url 'finance:account_list' %}" class="nav-link {% if 'account' in request.resolver_match.url_name|default:'' %}active{% endif %}">Chart of Accounts</a></li>
+        <li class="nav-item"><a href="{% url 'finance:journalentry_list' %}" class="nav-link {% if 'journalentry' in request.resolver_match.url_name|default:'' %}active{% endif %}">Journal Entries</a></li>
+        <li class="nav-item"><a href="{% url 'finance:invoice_list' %}" class="nav-link {% if 'invoice' in request.resolver_match.url_name|default:'' %}active{% endif %}">Invoices</a></li>
+        <li class="nav-item"><a href="{% url 'finance:taxrate_list' %}" class="nav-link {% if 'taxrate' in request.resolver_match.url_name|default:'' %}active{% endif %}">Tax Rates</a></li>
+        <li class="nav-item"><a href="{% url 'finance:budget_list' %}" class="nav-link {% if 'budget' in request.resolver_match.url_name|default:'' %}active{% endif %}">Budgets</a></li>
+      </div>
+
+      <li class="mt-2"><a href="#groupPayroll" class="sidebar-group-toggle text-secondary text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse">Payroll <span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupPayroll">
+        <li class="nav-item"><a href="{% url 'payroll:employee_list' %}" class="nav-link {% if 'employee' in request.resolver_match.url_name|default:'' %}active{% endif %}">Employees</a></li>
+        <li class="nav-item"><a href="{% url 'payroll:payrollrun_list' %}" class="nav-link {% if 'payrollrun' in request.resolver_match.url_name|default:'' %}active{% endif %}">Payroll Runs</a></li>
+      </div>
+
+      <li class="mt-2"><a href="#groupPurchasing" class="sidebar-group-toggle text-secondary text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse">Purchasing <span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupPurchasing">
+        <li class="nav-item"><a href="{% url 'purchasing:vendor_list' %}" class="nav-link {% if 'vendor' in request.resolver_match.url_name|default:'' %}active{% endif %}">Vendors</a></li>
+        <li class="nav-item"><a href="{% url 'purchasing:purchaseorder_list' %}" class="nav-link {% if 'purchaseorder' in request.resolver_match.url_name|default:'' %}active{% endif %}">Purchase Orders</a></li>
+      </div>
+
       {% if user.role == 'ADMIN' or user.is_superuser %}
-      <li><hr class="text-secondary"></li>
-      <li class="nav-item"><small class="text-secondary text-uppercase px-2">Admin</small></li>
-      <li class="nav-item"><a href="{% url 'accounts:user_list' %}" class="nav-link {% if 'user' in request.resolver_match.url_name|default:'' %}active{% endif %}">Users</a></li>
+      <li class="mt-2"><a href="#groupAdmin" class="sidebar-group-toggle text-secondary text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse">Pengaturan <span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupAdmin">
+        <li class="nav-item"><a href="{% url 'accounts:user_list' %}" class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}">Users</a></li>
+        <li class="nav-item"><a href="{% url 'accounts:settings' %}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">Company Settings</a></li>
+        <li class="nav-item"><a href="{% url 'accounts:auditlog_list' %}" class="nav-link {% if request.resolver_match.url_name == 'auditlog_list' %}active{% endif %}">Audit Log</a></li>
+      </div>
       {% endif %}
     </ul>
-    <hr class="text-secondary">
-    <div class="dropdown">
-      <a href="#" class="d-flex align-items-center text-white text-decoration-none">
-        {{ user }} <small class="text-secondary ms-1">({{ user.get_role_display }})</small>
-      </a>
-      <form method="post" action="{% url 'logout' %}" class="mt-2">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-sm btn-outline-light w-100">Logout</button>
-      </form>
-    </div>
   </nav>
-  <main class="flex-grow-1">
-    <div class="main-content">
-      {% include "partials/messages.html" %}
-      {% block content %}{% endblock %}
-    </div>
-  </main>
+
+  <div class="flex-grow-1 d-flex flex-column" style="min-width:0;">
+    <nav class="navbar navbar-expand navbar-light bg-white border-bottom px-3">
+      <form method="get" action="{% url 'dashboard:search' %}" class="d-flex flex-grow-1 me-3" style="max-width: 420px;">
+        <input type="search" name="q" class="form-control form-control-sm" placeholder="Cari contact, company, deal, invoice..." value="{{ request.GET.q|default:'' }}">
+      </form>
+
+      <ul class="navbar-nav flex-row ms-auto align-items-center gap-2">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">+ Baru</a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{% url 'crm:contact_create' %}">Contact</a></li>
+            <li><a class="dropdown-item" href="{% url 'crm:company_create' %}">Company</a></li>
+            <li><a class="dropdown-item" href="{% url 'crm:deal_create' %}">Deal</a></li>
+            <li><a class="dropdown-item" href="{% url 'crm:activity_create' %}">Task / Activity</a></li>
+            <li><a class="dropdown-item" href="{% url 'finance:invoice_create' %}">Invoice</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link position-relative" href="#" data-bs-toggle="dropdown">
+            Notifikasi
+            {% if nav_notification_count %}<span class="badge rounded-pill bg-danger">{{ nav_notification_count }}</span>{% endif %}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" style="min-width: 320px; max-height: 400px; overflow-y: auto;">
+            <li><h6 class="dropdown-header">Tasks jatuh tempo / overdue</h6></li>
+            {% for task in nav_tasks %}
+            <li><a class="dropdown-item small" href="{% url 'crm:activity_list' %}">{{ task.subject }} <span class="text-muted">({{ task.due_date }})</span></a></li>
+            {% empty %}
+            <li><span class="dropdown-item-text small text-muted">Tidak ada task jatuh tempo.</span></li>
+            {% endfor %}
+            <li><hr class="dropdown-divider"></li>
+            <li><h6 class="dropdown-header">Invoice overdue</h6></li>
+            {% for inv in nav_overdue_invoices %}
+            <li><a class="dropdown-item small" href="{% url 'finance:invoice_edit' inv.pk %}">{{ inv.number }} - {{ inv.customer|default:"-" }}</a></li>
+            {% empty %}
+            <li><span class="dropdown-item-text small text-muted">Tidak ada invoice overdue.</span></li>
+            {% endfor %}
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            {{ user }} <small class="text-muted">({{ user.get_role_display }})</small>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            {% if user.role == 'ADMIN' or user.is_superuser %}
+            <li><a class="dropdown-item" href="{% url 'accounts:settings' %}">Pengaturan</a></li>
+            <li><hr class="dropdown-divider"></li>
+            {% endif %}
+            <li>
+              <form method="post" action="{% url 'logout' %}" class="px-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-secondary w-100">Logout</button>
+              </form>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <main class="flex-grow-1">
+      <div class="main-content">
+        {% include "partials/messages.html" %}
+        {% block breadcrumb %}
+          {% if breadcrumbs %}
+          <nav aria-label="breadcrumb"><ol class="breadcrumb">
+            {% for label, url in breadcrumbs %}
+              {% if url %}<li class="breadcrumb-item"><a href="{{ url }}">{{ label }}</a></li>
+              {% else %}<li class="breadcrumb-item {% if forloop.last %}active{% endif %}">{{ label }}</li>{% endif %}
+            {% endfor %}
+          </ol></nav>
+          {% endif %}
+        {% endblock %}
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
 </div>
 {% else %}
   {% include "partials/messages.html" %}

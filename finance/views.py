@@ -3,6 +3,7 @@ from core.views import (
     GenericTenantDeleteView,
     GenericTenantListView,
     GenericTenantUpdateView,
+    TenantCSVExportView,
     TenantFormsetMixin,
 )
 from .forms import (
@@ -112,6 +113,7 @@ class InvoiceListView(GenericTenantListView):
     model = Invoice
     title = "Invoices"
     url_basename = "finance:invoice"
+    has_export = True
     list_fields = [
         ("No.", "number"), ("Customer", "customer"), ("Jatuh Tempo", "due_date"),
         ("Status", "get_status_display"), ("Total", "total"),
@@ -179,3 +181,18 @@ class BudgetDeleteView(GenericTenantDeleteView):
     model = Budget
     title = "Budget"
     url_basename = "finance:budget"
+
+
+# ---- CSV Export ----
+
+class InvoiceExportView(TenantCSVExportView):
+    model = Invoice
+    filename = "invoices"
+    export_fields = [
+        ("No.", "number"), ("Customer", "customer"), ("Tgl Terbit", "issue_date"),
+        ("Jatuh Tempo", "due_date"), ("Status", "get_status_display"),
+        ("Subtotal", "subtotal"), ("Pajak", "tax_total"), ("Total", "total"),
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("customer")

@@ -30,6 +30,15 @@ class TenantIsolationTests(TestCase):
         response = self.client.get(reverse("crm:company_edit", args=[self.company_b.pk]))
         self.assertEqual(response.status_code, 404)
 
+    def test_csv_export_only_includes_own_tenant_data(self):
+        self.client.login(username="user_a", password="pass12345")
+        response = self.client.get(reverse("crm:company_export"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv")
+        body = response.content.decode()
+        self.assertIn("Company A", body)
+        self.assertNotIn("Company B", body)
+
 
 class DealCRUDTests(TestCase):
     def setUp(self):

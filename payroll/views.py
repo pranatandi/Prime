@@ -10,6 +10,7 @@ from core.views import (
     GenericTenantDeleteView,
     GenericTenantListView,
     GenericTenantUpdateView,
+    TenantCSVExportView,
 )
 from .forms import EmployeeForm, PayrollRunForm
 from .models import Employee, PayrollRun, Payslip
@@ -21,6 +22,7 @@ class EmployeeListView(GenericTenantListView):
     model = Employee
     title = "Employees"
     url_basename = "payroll:employee"
+    has_export = True
     list_fields = [
         ("Nama", "name"), ("Posisi", "position"), ("Departemen", "department"),
         ("Gaji Pokok", "base_salary"), ("Aktif", "is_active"),
@@ -102,3 +104,14 @@ class PayrollRunProcessView(LoginRequiredMixin, View):
         run.save()
         messages.success(request, f"Payroll run diproses: {created} payslip dibuat.")
         return redirect("payroll:payrollrun_detail", pk=run.pk)
+
+
+# ---- CSV Export ----
+
+class EmployeeExportView(TenantCSVExportView):
+    model = Employee
+    filename = "employees"
+    export_fields = [
+        ("Nama", "name"), ("Posisi", "position"), ("Departemen", "department"),
+        ("Tgl Masuk", "hire_date"), ("Gaji Pokok", "base_salary"), ("Aktif", "is_active"),
+    ]
