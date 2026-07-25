@@ -218,6 +218,9 @@ class Payment(TenantScopedModel):
     date = models.DateField()
     amount = models.DecimalField(max_digits=14, decimal_places=2)
     invoice = models.ForeignKey(Invoice, on_delete=models.SET_NULL, null=True, blank=True, related_name="payments")
+    bill = models.ForeignKey(
+        "purchasing.Bill", on_delete=models.SET_NULL, null=True, blank=True, related_name="payments",
+    )
     memo = models.CharField(max_length=255, blank=True)
     is_reconciled = models.BooleanField(default=False)
     reconciled_at = models.DateTimeField(null=True, blank=True)

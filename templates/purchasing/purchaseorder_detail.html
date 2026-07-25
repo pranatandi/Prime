@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load crm_extras %}
+{% block title %}Purchase Order {{ po.po_number }}{% endblock %}
+{% block breadcrumb %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'purchasing:purchaseorder_list' %}">Purchase Orders</a></li>
+  <li class="breadcrumb-item active">{{ po.po_number }}</li>
+</ol></nav>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><i class="bi bi-cart-check me-2 text-muted"></i>Purchase Order {{ po.po_number }}</h3>
+  <div class="d-flex align-items-center gap-2">
+    {{ po.get_status_display|smart_badge }}
+    {% if po.status == 'DRAFT' or po.status == 'SENT' %}
+    <a href="{% url 'purchasing:purchaseorder_receive' po.pk %}" class="btn btn-primary"><i class="bi bi-box-seam"></i>Tandai Diterima</a>
+    {% endif %}
+    {% if po.status == 'RECEIVED' %}
+    <form method="post" action="{% url 'purchasing:purchaseorder_create_bill' po.pk %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary"><i class="bi bi-receipt"></i>Buat Bill</button>
+    </form>
+    {% endif %}
+    <a href="{% url 'purchasing:purchaseorder_edit' po.pk %}" class="btn btn-outline-secondary"><i class="bi bi-pencil"></i>Edit</a>
+    <a href="{% url 'purchasing:purchaseorder_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i>Kembali</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="text-muted small">Vendor</div>
+    <div>{{ po.vendor|default:"-" }}</div>
+  </div>
+  <div class="col-md-4">
+    <div class="text-muted small">Warehouse</div>
+    <div>{{ po.warehouse|default:"-" }}</div>
+  </div>
+  <div class="col-md-4">
+    <div class="text-muted small">Tgl Order</div>
+    <div>{{ po.order_date }}</div>
+  </div>
+</div>
+
+{% if po.bills.all %}
+<div class="mb-3">
+  <div class="text-muted small mb-1">Bills terkait</div>
+  {% for bill in po.bills.all %}
+  <a href="{% url 'purchasing:bill_edit' bill.pk %}" class="badge rounded-pill bg-primary-subtle text-primary-emphasis text-decoration-none me-1">{{ bill.number }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+  <table class="table mb-0">
+    <thead><tr><th>Produk</th><th>Deskripsi</th><th>Qty</th><th>Harga Satuan</th><th>Total</th></tr></thead>
+    <tbody>
+      {% for item in po.items.all %}
+      <tr>
+        <td>{{ item.product|default:"-" }}</td>
+        <td>{{ item.description }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>Rp {{ item.unit_price|floatformat:0 }}</td>
+        <td>Rp {{ item.line_total|floatformat:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center text-muted py-4">Belum ada item.</td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr class="table-light fw-bold"><td colspan="4" class="text-end">Total</td><td>Rp {{ po.total|floatformat:0 }}</td></tr>
+    </tfoot>
+  </table>
+</div>
+{% endblock %}

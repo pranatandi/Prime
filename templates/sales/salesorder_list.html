@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load crm_extras %}
+{% block title %}Sales Orders{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><i class="bi bi-cart3 me-2 text-muted"></i>Sales Orders</h3>
+  <a href="{% url 'sales:salesorder_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i>Tambah Sales Order</a>
+</div>
+<div class="card">
+  <table class="table table-hover mb-0 align-middle">
+    <thead>
+      <tr><th>No. SO</th><th>Customer</th><th>Tgl Order</th><th>Status</th><th>Total</th><th class="text-end">Aksi</th></tr>
+    </thead>
+    <tbody>
+      {% for so in object_list %}
+      <tr>
+        <td>{{ so.so_number }}</td>
+        <td>{{ so.customer|default:"-" }}</td>
+        <td>{{ so.order_date }}</td>
+        <td>{{ so.get_status_display|smart_badge }}</td>
+        <td>Rp {{ so.total|floatformat:0 }}</td>
+        <td class="text-end">
+          <a href="{% url 'sales:salesorder_detail' so.pk %}" class="btn btn-sm btn-outline-primary" title="Detail"><i class="bi bi-eye"></i></a>
+          <a href="{% url 'sales:salesorder_edit' so.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+          <a href="{% url 'sales:salesorder_delete' so.pk %}" class="btn btn-sm btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">
+        <div class="empty-state"><i class="bi bi-cart3"></i>Belum ada sales order.</div>
+      </td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

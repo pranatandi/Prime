@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     "crm",
     "dashboard",
     "finance",
+    "inventory",
+    "sales",
     "payroll",
     "purchasing",
 ]

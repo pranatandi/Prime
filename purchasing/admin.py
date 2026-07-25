@@ -1,11 +1,16 @@
 from django.contrib import admin
 
 from core.admin import TenantScopedAdmin
-from .models import PurchaseOrder, PurchaseOrderItem, Vendor
+from .models import Bill, BillItem, PurchaseOrder, PurchaseOrderItem, Vendor
 
 
 class PurchaseOrderItemInline(admin.TabularInline):
     model = PurchaseOrderItem
+    extra = 1
+
+
+class BillItemInline(admin.TabularInline):
+    model = BillItem
     extra = 1
 
 
@@ -22,3 +27,11 @@ class PurchaseOrderAdmin(TenantScopedAdmin):
     list_filter = ("tenant", "status")
     search_fields = ("po_number",)
     inlines = [PurchaseOrderItemInline]
+
+
+@admin.register(Bill)
+class BillAdmin(TenantScopedAdmin):
+    list_display = ("number", "vendor", "bill_date", "due_date", "status", "total", "tenant")
+    list_filter = ("tenant", "status")
+    search_fields = ("number",)
+    inlines = [BillItemInline]

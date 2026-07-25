@@ -115,12 +115,15 @@ class BankAccountForm(BootstrapModelForm):
 class PaymentForm(BootstrapModelForm):
     class Meta:
         model = Payment
-        fields = ["bank_account", "direction", "date", "amount", "contra_account", "invoice", "memo"]
+        fields = ["bank_account", "direction", "date", "amount", "contra_account", "invoice", "bill", "memo"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        from purchasing.models import Bill
         self.fields["bank_account"].queryset = BankAccount.objects.filter(tenant=self.tenant)
         self.fields["contra_account"].queryset = Account.objects.filter(tenant=self.tenant)
         self.fields["invoice"].queryset = Invoice.objects.filter(tenant=self.tenant)
         self.fields["invoice"].required = False
+        self.fields["bill"].queryset = Bill.objects.filter(tenant=self.tenant)
+        self.fields["bill"].required = False
         self.fields["date"].widget.attrs["type"] = "date"

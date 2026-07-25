@@ -65,5 +65,5 @@ class BankAccountAdmin(TenantScopedAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(TenantScopedAdmin):
-    list_display = ("date", "bank_account", "direction", "amount", "contra_account", "invoice", "is_reconciled", "tenant")
+    list_display = ("date", "bank_account", "direction", "amount", "contra_account", "invoice", "bill", "is_reconciled", "tenant")
     list_filter = ("tenant", "direction", "is_reconciled")

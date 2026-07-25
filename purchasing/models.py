@@ -3,6 +3,8 @@ from decimal import Decimal
 from django.db import models
 
 from core.models import TenantScopedModel
+from finance.models import Payment, TaxRate
+from inventory.models import Product, Warehouse
 
 
 class Vendor(TenantScopedModel):
@@ -28,6 +30,7 @@ class PurchaseOrder(TenantScopedModel):
 
     po_number = models.CharField(max_length=50)
     vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True, blank=True, related_name="purchase_orders")
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True, blank=True, related_name="purchase_orders")
     order_date = models.DateField()
     expected_delivery = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.DRAFT)
@@ -49,6 +52,7 @@ class PurchaseOrder(TenantScopedModel):
 
 class PurchaseOrderItem(models.Model):
     purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     description = models.CharField(max_length=255)
     quantity = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     unit_price = models.DecimalField(max_digits=14, decimal_places=2, default=0)
@@ -59,3 +63,71 @@ class PurchaseOrderItem(models.Model):
     @property
     def line_total(self):
         return self.quantity * self.unit_price
+
+
+class Bill(TenantScopedModel):
+    class Status(models.TextChoices):
+        DRAFT = "DRAFT", "Draft"
+        RECEIVED = "RECEIVED", "Received"
+        PAID = "PAID", "Paid"
+        OVERDUE = "OVERDUE", "Overdue"
+
+    number = models.CharField(max_length=50)
+    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True, blank=True, related_name="bills")
+    purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.SET_NULL, null=True, blank=True, related_name="bills")
+    bill_date = models.DateField()
+    due_date = models.DateField()
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.DRAFT)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-bill_date", "-id"]
+        constraints = [
+            models.UniqueConstraint(fields=["tenant", "number"], name="unique_bill_number_per_tenant"),
+        ]
+
+    def __str__(self):
+        return self.number
+
+    @property
+    def subtotal(self):
+        return sum((item.line_total for item in self.items.all()), Decimal("0"))
+
+    @property
+    def tax_total(self):
+        return sum((item.tax_amount for item in self.items.all()), Decimal("0"))
+
+    @property
+    def total(self):
+        return self.subtotal + self.tax_total
+
+    @property
+    def amount_paid(self):
+        return sum(
+            (p.amount for p in self.payments.filter(direction=Payment.Direction.OUT)), Decimal("0")
+        )
+
+    @property
+    def balance_due(self):
+        return self.total - self.amount_paid
+
+
+class BillItem(models.Model):
+    bill = models.ForeignKey(Bill, on_delete=models.CASCADE, related_name="items")
+    description = models.CharField(max_length=255)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    unit_price = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    tax_rate = models.ForeignKey(TaxRate, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.description
+
+    @property
+    def line_total(self):
+        return self.quantity * self.unit_price
+
+    @property
+    def tax_amount(self):
+        if self.tax_rate:
+            return self.line_total * self.tax_rate.rate / Decimal("100")
+        return Decimal("0")

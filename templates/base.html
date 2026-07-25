@@ -41,6 +41,18 @@
         <li class="nav-item"><a href="{% url 'crm:activity_list' %}" class="nav-link {% if 'activity' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-check2-square"></i>Tasks &amp; Activities</a></li>
       </div>
 
+      <li class="mt-3"><a href="#groupSales" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-cart3"></i>Sales</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupSales">
+        <li class="nav-item"><a href="{% url 'sales:salesorder_list' %}" class="nav-link {% if 'salesorder' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-cart3"></i>Sales Orders</a></li>
+      </div>
+
+      <li class="mt-3"><a href="#groupInventory" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-box-seam"></i>Inventory</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupInventory">
+        <li class="nav-item"><a href="{% url 'inventory:product_list' %}" class="nav-link {% if 'product' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-box"></i>Products</a></li>
+        <li class="nav-item"><a href="{% url 'inventory:warehouse_list' %}" class="nav-link {% if 'warehouse' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-building-gear"></i>Warehouses</a></li>
+        <li class="nav-item"><a href="{% url 'inventory:stockmovement_list' %}" class="nav-link {% if request.resolver_match.url_name == 'stockmovement_list' %}active{% endif %}"><i class="bi bi-arrow-down-up"></i>Stock Movements</a></li>
+      </div>
+
       <li class="mt-3"><a href="#groupFinance" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-wallet2"></i>Finance</span><span class="collapse-caret">&#9662;</span></a></li>
       <div class="collapse show" id="groupFinance">
         <li class="nav-item"><a href="{% url 'finance:account_list' %}" class="nav-link {% if request.resolver_match.url_name|default:''|starts_with:'account_' %}active{% endif %}"><i class="bi bi-diagram-3"></i>Chart of Accounts</a></li>
@@ -66,6 +78,7 @@
       <div class="collapse show" id="groupPurchasing">
         <li class="nav-item"><a href="{% url 'purchasing:vendor_list' %}" class="nav-link {% if 'vendor' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-truck"></i>Vendors</a></li>
         <li class="nav-item"><a href="{% url 'purchasing:purchaseorder_list' %}" class="nav-link {% if 'purchaseorder' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-cart-check"></i>Purchase Orders</a></li>
+        <li class="nav-item"><a href="{% url 'purchasing:bill_list' %}" class="nav-link {% if request.resolver_match.url_name|default:''|starts_with:'bill_' %}active{% endif %}"><i class="bi bi-receipt-cutoff"></i>Bills</a></li>
       </div>
 
       {% if user.role == 'ADMIN' or user.is_superuser %}
@@ -97,8 +110,11 @@
             <li><a class="dropdown-item" href="{% url 'crm:company_create' %}"><i class="bi bi-building"></i>Company</a></li>
             <li><a class="dropdown-item" href="{% url 'crm:deal_create' %}"><i class="bi bi-kanban"></i>Deal</a></li>
             <li><a class="dropdown-item" href="{% url 'crm:activity_create' %}"><i class="bi bi-check2-square"></i>Task / Activity</a></li>
+            <li><a class="dropdown-item" href="{% url 'sales:salesorder_create' %}"><i class="bi bi-cart3"></i>Sales Order</a></li>
             <li><a class="dropdown-item" href="{% url 'finance:invoice_create' %}"><i class="bi bi-receipt"></i>Invoice</a></li>
             <li><a class="dropdown-item" href="{% url 'finance:payment_create' %}"><i class="bi bi-cash-coin"></i>Payment</a></li>
+            <li><a class="dropdown-item" href="{% url 'purchasing:purchaseorder_create' %}"><i class="bi bi-cart-check"></i>Purchase Order</a></li>
+            <li><a class="dropdown-item" href="{% url 'inventory:product_create' %}"><i class="bi bi-box"></i>Product</a></li>
           </ul>
         </li>
 
