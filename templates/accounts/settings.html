@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Pengaturan{% endblock %}
+{% block breadcrumb %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active">Pengaturan</li>
+</ol></nav>
+{% endblock %}
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-gear me-2 text-muted"></i>Pengaturan Perusahaan</h3>
+
+<div class="row g-3">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i>Simpan</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header">Pengaturan Lain</div>
+      <div class="list-group list-group-flush">
+        <a href="{% url 'accounts:user_list' %}" class="list-group-item list-group-item-action"><i class="bi bi-person-gear me-2"></i>Pengguna &amp; Role</a>
+        <a href="{% url 'crm:stage_list' %}" class="list-group-item list-group-item-action"><i class="bi bi-kanban me-2"></i>Pipeline Stages</a>
+        <a href="{% url 'finance:taxrate_list' %}" class="list-group-item list-group-item-action"><i class="bi bi-percent me-2"></i>Tax Rates</a>
+        <a href="{% url 'accounts:auditlog_list' %}" class="list-group-item list-group-item-action"><i class="bi bi-shield-check me-2"></i>Audit Log</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% load static crm_extras %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Prime{% endblock %} | Prime CRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{% static 'css/custom.css' %}" rel="stylesheet">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% if user.is_authenticated %}
+<div class="sidebar-backdrop" onclick="document.body.classList.remove('sidebar-open')"></div>
+<div class="d-flex">
+  <nav class="sidebar d-flex flex-column p-3 flex-shrink-0">
+    <a href="{% url 'dashboard:index' %}" class="d-flex align-items-center gap-2 mb-3 text-decoration-none">
+      <span class="brand-mark">P</span>
+      <span class="fw-bold fs-5" style="color:#1f2333;">Prime</span>
+    </a>
+    {% if user.tenant %}
+    <div class="small text-muted mb-3 px-1 text-truncate"><i class="bi bi-building"></i> {{ user.tenant.name }}</div>
+    {% endif %}
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item"><a href="{% url 'dashboard:index' %}" class="nav-link {% if request.resolver_match.namespace == 'dashboard' and request.resolver_match.url_name == 'index' %}active{% endif %}"><i class="bi bi-speedometer2"></i>Dashboard</a></li>
+
+      <li class="mt-3"><a href="#groupReports" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-clipboard-data"></i>Reports</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupReports">
+        <li class="nav-item"><a href="{% url 'dashboard:sales_report' %}" class="nav-link {% if request.resolver_match.url_name == 'sales_report' %}active{% endif %}"><i class="bi bi-graph-up-arrow"></i>Sales Report</a></li>
+        <li class="nav-item"><a href="{% url 'dashboard:financial_report' %}" class="nav-link {% if request.resolver_match.url_name == 'financial_report' %}active{% endif %}"><i class="bi bi-bar-chart-line"></i>Financial Report</a></li>
+      </div>
+
+      <li class="mt-3"><a href="#groupCRM" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-people-fill"></i>CRM</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupCRM">
+        <li class="nav-item"><a href="{% url 'crm:company_list' %}" class="nav-link {% if 'company' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-building"></i>Companies</a></li>
+        <li class="nav-item"><a href="{% url 'crm:contact_list' %}" class="nav-link {% if 'contact' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-person-lines-fill"></i>Contacts</a></li>
+        <li class="nav-item"><a href="{% url 'crm:deal_board' %}" class="nav-link {% if 'deal' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-kanban"></i>Deals / Pipeline</a></li>
+        <li class="nav-item"><a href="{% url 'crm:activity_list' %}" class="nav-link {% if 'activity' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-check2-square"></i>Tasks &amp; Activities</a></li>
+      </div>
+
+      <li class="mt-3"><a href="#groupSales" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-cart3"></i>Sales</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupSales">
+        <li class="nav-item"><a href="{% url 'sales:salesorder_list' %}" class="nav-link {% if 'salesorder' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-cart3"></i>Sales Orders</a></li>
+      </div>
+
+      <li class="mt-3"><a href="#groupInventory" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-box-seam"></i>Inventory</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupInventory">
+        <li class="nav-item"><a href="{% url 'inventory:product_list' %}" class="nav-link {% if 'product' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-box"></i>Products</a></li>
+        <li class="nav-item"><a href="{% url 'inventory:warehouse_list' %}" class="nav-link {% if 'warehouse' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-building-gear"></i>Warehouses</a></li>
+        <li class="nav-item"><a href="{% url 'inventory:stockmovement_list' %}" class="nav-link {% if request.resolver_match.url_name == 'stockmovement_list' %}active{% endif %}"><i class="bi bi-arrow-down-up"></i>Stock Movements</a></li>
+      </div>
+
+      <li class="mt-3"><a href="#groupFinance" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-wallet2"></i>Finance</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupFinance">
+        <li class="nav-item"><a href="{% url 'finance:account_list' %}" class="nav-link {% if request.resolver_match.url_name|default:''|starts_with:'account_' %}active{% endif %}"><i class="bi bi-diagram-3"></i>Chart of Accounts</a></li>
+        <li class="nav-item"><a href="{% url 'finance:journalentry_list' %}" class="nav-link {% if 'journalentry' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-journal-text"></i>Journal Entries</a></li>
+        <li class="nav-item"><a href="{% url 'finance:invoice_list' %}" class="nav-link {% if 'invoice' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-receipt"></i>Invoices</a></li>
+        <li class="nav-item"><a href="{% url 'finance:taxrate_list' %}" class="nav-link {% if 'taxrate' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-percent"></i>Tax Rates</a></li>
+        <li class="nav-item"><a href="{% url 'finance:budget_list' %}" class="nav-link {% if 'budget' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-piggy-bank"></i>Budgets</a></li>
+        <li class="nav-item"><a href="{% url 'finance:bankaccount_list' %}" class="nav-link {% if request.resolver_match.url_name|default:''|starts_with:'bankaccount' %}active{% endif %}"><i class="bi bi-bank"></i>Bank Accounts</a></li>
+        <li class="nav-item"><a href="{% url 'finance:payment_list' %}" class="nav-link {% if request.resolver_match.url_name|default:''|starts_with:'payment_' %}active{% endif %}"><i class="bi bi-cash-coin"></i>Payments</a></li>
+        <li class="mt-2 mb-1"><small class="text-muted text-uppercase px-2" style="font-size:0.68rem;">Laporan Keuangan</small></li>
+        <li class="nav-item"><a href="{% url 'finance:balance_sheet' %}" class="nav-link {% if request.resolver_match.url_name == 'balance_sheet' %}active{% endif %}"><i class="bi bi-clipboard-data"></i>Neraca</a></li>
+        <li class="nav-item"><a href="{% url 'finance:income_statement' %}" class="nav-link {% if request.resolver_match.url_name == 'income_statement' %}active{% endif %}"><i class="bi bi-graph-up"></i>Laba Rugi</a></li>
+        <li class="nav-item"><a href="{% url 'finance:cash_flow' %}" class="nav-link {% if request.resolver_match.url_name == 'cash_flow' %}active{% endif %}"><i class="bi bi-arrow-left-right"></i>Arus Kas</a></li>
+      </div>
+
+      <li class="mt-3"><a href="#groupAssets" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-building-gear"></i>Fixed Assets</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupAssets">
+        <li class="nav-item"><a href="{% url 'assets:fixedasset_list' %}" class="nav-link {% if request.resolver_match.namespace == 'assets' %}active{% endif %}"><i class="bi bi-building-gear"></i>Fixed Assets</a></li>
+      </div>
+
+      <li class="mt-3"><a href="#groupPayroll" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-cash-stack"></i>Payroll</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupPayroll">
+        <li class="nav-item"><a href="{% url 'payroll:employee_list' %}" class="nav-link {% if 'employee' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-people"></i>Employees</a></li>
+        <li class="nav-item"><a href="{% url 'payroll:payrollrun_list' %}" class="nav-link {% if 'payrollrun' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-cash-stack"></i>Payroll Runs</a></li>
+      </div>
+
+      <li class="mt-3"><a href="#groupPurchasing" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-bag"></i>Purchasing</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupPurchasing">
+        <li class="nav-item"><a href="{% url 'purchasing:vendor_list' %}" class="nav-link {% if 'vendor' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-truck"></i>Vendors</a></li>
+        <li class="nav-item"><a href="{% url 'purchasing:purchaseorder_list' %}" class="nav-link {% if 'purchaseorder' in request.resolver_match.url_name|default:'' %}active{% endif %}"><i class="bi bi-cart-check"></i>Purchase Orders</a></li>
+        <li class="nav-item"><a href="{% url 'purchasing:bill_list' %}" class="nav-link {% if request.resolver_match.url_name|default:''|starts_with:'bill_' %}active{% endif %}"><i class="bi bi-receipt-cutoff"></i>Bills</a></li>
+      </div>
+
+      {% if user.role == 'ADMIN' or user.is_superuser %}
+      <li class="mt-3"><a href="#groupAdmin" class="sidebar-group-toggle text-uppercase small text-decoration-none d-flex justify-content-between align-items-center px-2" data-bs-toggle="collapse"><span><i class="bi bi-gear-fill"></i>Pengaturan</span><span class="collapse-caret">&#9662;</span></a></li>
+      <div class="collapse show" id="groupAdmin">
+        <li class="nav-item"><a href="{% url 'accounts:user_list' %}" class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}"><i class="bi bi-person-gear"></i>Users</a></li>
+        <li class="nav-item"><a href="{% url 'accounts:settings' %}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"><i class="bi bi-gear"></i>Company Settings</a></li>
+        <li class="nav-item"><a href="{% url 'accounts:auditlog_list' %}" class="nav-link {% if request.resolver_match.url_name == 'auditlog_list' %}active{% endif %}"><i class="bi bi-shield-check"></i>Audit Log</a></li>
+      </div>
+      {% endif %}
+    </ul>
+  </nav>
+
+  <div class="flex-grow-1 d-flex flex-column" style="min-width:0;">
+    <nav class="navbar navbar-expand topbar px-3">
+      <button type="button" class="btn btn-sm btn-outline-secondary sidebar-toggle-btn me-2" onclick="document.body.classList.toggle('sidebar-open')">
+        <i class="bi bi-list"></i>
+      </button>
+      <form method="get" action="{% url 'dashboard:search' %}" class="search-box flex-grow-1 me-3" style="max-width: 420px;">
+        <i class="bi bi-search"></i>
+        <input type="search" name="q" class="form-control form-control-sm" placeholder="Cari contact, company, deal, invoice..." value="{{ request.GET.q|default:'' }}">
+      </form>
+
+      <ul class="navbar-nav flex-row ms-auto align-items-center gap-1">
+        <li class="nav-item dropdown">
+          <a class="btn btn-primary btn-sm dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="bi bi-plus-lg"></i>Baru</a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{% url 'crm:contact_create' %}"><i class="bi bi-person-lines-fill"></i>Contact</a></li>
+            <li><a class="dropdown-item" href="{% url 'crm:company_create' %}"><i class="bi bi-building"></i>Company</a></li>
+            <li><a class="dropdown-item" href="{% url 'crm:deal_create' %}"><i class="bi bi-kanban"></i>Deal</a></li>
+            <li><a class="dropdown-item" href="{% url 'crm:activity_create' %}"><i class="bi bi-check2-square"></i>Task / Activity</a></li>
+            <li><a class="dropdown-item" href="{% url 'sales:salesorder_create' %}"><i class="bi bi-cart3"></i>Sales Order</a></li>
+            <li><a class="dropdown-item" href="{% url 'finance:invoice_create' %}"><i class="bi bi-receipt"></i>Invoice</a></li>
+            <li><a class="dropdown-item" href="{% url 'finance:payment_create' %}"><i class="bi bi-cash-coin"></i>Payment</a></li>
+            <li><a class="dropdown-item" href="{% url 'purchasing:purchaseorder_create' %}"><i class="bi bi-cart-check"></i>Purchase Order</a></li>
+            <li><a class="dropdown-item" href="{% url 'inventory:product_create' %}"><i class="bi bi-box"></i>Product</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown notif-bell">
+          <a class="nav-link px-2" href="#" data-bs-toggle="dropdown">
+            <i class="bi bi-bell fs-5 text-secondary"></i>
+            {% if nav_notification_count %}<span class="badge rounded-pill bg-danger">{{ nav_notification_count }}</span>{% endif %}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" style="min-width: 320px; max-height: 400px; overflow-y: auto;">
+            <li><h6 class="dropdown-header"><i class="bi bi-check2-square"></i>Tasks jatuh tempo / overdue</h6></li>
+            {% for task in nav_tasks %}
+            <li><a class="dropdown-item small" href="{% url 'crm:activity_list' %}">{{ task.subject }} <span class="text-muted">({{ task.due_date }})</span></a></li>
+            {% empty %}
+            <li><span class="dropdown-item-text small text-muted">Tidak ada task jatuh tempo.</span></li>
+            {% endfor %}
+            <li><hr class="dropdown-divider"></li>
+            <li><h6 class="dropdown-header"><i class="bi bi-receipt"></i>Invoice overdue</h6></li>
+            {% for inv in nav_overdue_invoices %}
+            <li><a class="dropdown-item small" href="{% url 'finance:invoice_edit' inv.pk %}">{{ inv.number }} - {{ inv.customer|default:"-" }}</a></li>
+            {% empty %}
+            <li><span class="dropdown-item-text small text-muted">Tidak ada invoice overdue.</span></li>
+            {% endfor %}
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 px-2" href="#" data-bs-toggle="dropdown">
+            <span class="avatar-circle">{{ user.first_name|default:user.username|first|upper }}</span>
+            <span class="d-none d-lg-inline small">
+              {{ user }}<br><span class="text-muted">{{ user.get_role_display }}</span>
+            </span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            {% if user.role == 'ADMIN' or user.is_superuser %}
+            <li><a class="dropdown-item" href="{% url 'accounts:settings' %}"><i class="bi bi-gear"></i>Pengaturan</a></li>
+            <li><hr class="dropdown-divider"></li>
+            {% endif %}
+            <li>
+              <form method="post" action="{% url 'logout' %}" class="px-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-secondary w-100"><i class="bi bi-box-arrow-right"></i>Logout</button>
+              </form>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <main class="flex-grow-1">
+      <div class="main-content">
+        {% include "partials/messages.html" %}
+        {% block breadcrumb %}
+          {% if breadcrumbs %}
+          <nav aria-label="breadcrumb"><ol class="breadcrumb">
+            {% for label, url in breadcrumbs %}
+              {% if url %}<li class="breadcrumb-item"><a href="{{ url }}">{{ label }}</a></li>
+              {% else %}<li class="breadcrumb-item {% if forloop.last %}active{% endif %}">{{ label }}</li>{% endif %}
+            {% endfor %}
+          </ol></nav>
+          {% endif %}
+        {% endblock %}
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+</div>
+{% else %}
+  {% include "partials/messages.html" %}
+  {% block guest_content %}{% endblock %}
+{% endif %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

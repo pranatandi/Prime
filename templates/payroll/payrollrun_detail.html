@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load crm_extras %}
+{% block title %}Payroll Run{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><i class="bi bi-cash-stack me-2 text-muted"></i>Payroll {{ run.period_start }} &ndash; {{ run.period_end }}</h3>
+  <div class="d-flex align-items-center gap-2">
+    {{ run.get_status_display|smart_badge }}
+    {% if run.status == 'DRAFT' %}
+    <form method="post" action="{% url 'payroll:payrollrun_process' run.pk %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary"><i class="bi bi-play-fill"></i>Proses Payroll</button>
+    </form>
+    {% endif %}
+    <a href="{% url 'payroll:payrollrun_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i>Kembali</a>
+  </div>
+</div>
+<div class="card">
+  <table class="table mb-0">
+    <thead>
+      <tr><th>Karyawan</th><th>Gaji Pokok</th><th>Tunjangan</th><th>Potongan</th><th>Net Pay</th></tr>
+    </thead>
+    <tbody>
+      {% for slip in run.payslips.all %}
+      <tr>
+        <td>{{ slip.employee }}</td>
+        <td>Rp {{ slip.base_salary|floatformat:0 }}</td>
+        <td>Rp {{ slip.allowances|floatformat:0 }}</td>
+        <td>Rp {{ slip.deductions|floatformat:0 }}</td>
+        <td class="fw-bold">Rp {{ slip.net_pay|floatformat:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">
+        <div class="empty-state"><i class="bi bi-receipt-cutoff"></i>Belum ada payslip. Klik "Proses Payroll" untuk generate dari data karyawan aktif.</div>
+      </td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

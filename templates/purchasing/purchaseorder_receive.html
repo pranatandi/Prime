@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Terima Purchase Order {{ po.po_number }}{% endblock %}
+{% block breadcrumb %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'purchasing:purchaseorder_list' %}">Purchase Orders</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'purchasing:purchaseorder_detail' po.pk %}">{{ po.po_number }}</a></li>
+  <li class="breadcrumb-item active">Terima Barang</li>
+</ol></nav>
+{% endblock %}
+{% block content %}
+<h3 class="mb-3"><i class="bi bi-box-seam me-2 text-muted"></i>Tandai Diterima - {{ po.po_number }}</h3>
+<div class="card" style="max-width: 560px;">
+  <div class="card-body">
+    <p class="text-muted small">
+      Stok akan bertambah di gudang <strong>{{ po.warehouse|default:"-" }}</strong> untuk semua item berproduk.
+      Pilih akun lawan untuk jurnal penerimaan barang (mis. Hutang Usaha).
+    </p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+        {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+      </div>
+      {% endfor %}
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i>Konfirmasi Terima</button>
+        <a href="{% url 'purchasing:purchaseorder_detail' po.pk %}" class="btn btn-outline-secondary">Batal</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

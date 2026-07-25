@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Arus Kas{% endblock %}
+{% block breadcrumb %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+  <li class="breadcrumb-item">Laporan Keuangan</li>
+  <li class="breadcrumb-item active">Arus Kas</li>
+</ol></nav>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><i class="bi bi-arrow-left-right me-2 text-muted"></i>Arus Kas Sederhana</h3>
+  <form method="get" class="d-flex gap-2">
+    <input type="date" name="start" value="{{ start }}" class="form-control form-control-sm">
+    <input type="date" name="end" value="{{ end }}" class="form-control form-control-sm">
+    <button type="submit" class="btn btn-sm btn-outline-primary">Tampilkan</button>
+  </form>
+</div>
+<p class="text-muted">
+  Periode {{ start }} s/d {{ end }} &mdash; dihitung langsung dari mutasi Bank/Kas (metode langsung),
+  bukan klasifikasi Operating/Investing/Financing penuh.
+</p>
+
+<div class="card">
+  <table class="table mb-0">
+    <thead class="table-light">
+      <tr><th>Bank/Kas</th><th class="text-end">Saldo Awal</th><th class="text-end">Uang Masuk</th><th class="text-end">Uang Keluar</th><th class="text-end">Saldo Akhir</th></tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.bank_account.name }}</td>
+        <td class="text-end">Rp {{ row.beginning|floatformat:0 }}</td>
+        <td class="text-end text-success">Rp {{ row.cash_in|floatformat:0 }}</td>
+        <td class="text-end text-danger">Rp {{ row.cash_out|floatformat:0 }}</td>
+        <td class="text-end fw-bold">Rp {{ row.ending|floatformat:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center text-muted py-4">Belum ada Bank Account.</td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr class="table-light fw-bold">
+        <td>Total</td><td></td>
+        <td class="text-end">Rp {{ total_in|floatformat:0 }}</td>
+        <td class="text-end">Rp {{ total_out|floatformat:0 }}</td>
+        <td class="text-end">Rp {{ net_change|floatformat:0 }}</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% endblock %}

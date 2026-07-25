@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load crm_extras %}
+{% block title %}Financial Report{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+{% endblock %}
+{% block breadcrumb %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+  <li class="breadcrumb-item">Reports</li>
+  <li class="breadcrumb-item active">Financial Report</li>
+</ol></nav>
+{% endblock %}
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-bar-chart-line me-2 text-muted"></i>Financial Report</h3>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-7">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-arrow-left-right me-2"></i>Income vs Expense per Bulan (6 Bulan Terakhir)</div>
+      <div class="card-body"><canvas id="incomeExpenseChart" height="120"></canvas></div>
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-hourglass-split me-2"></i>AR Aging (Invoice Belum Lunas)</div>
+      <table class="table mb-0">
+        <tbody>
+          {% for label, total in aging.items %}
+          <tr>
+            <td>{{ label }}</td>
+            <td class="text-end fw-bold">Rp {{ total|floatformat:0 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><i class="bi bi-receipt me-2"></i>Invoice Belum Lunas</div>
+  <table class="table mb-0">
+    <thead><tr><th>No.</th><th>Customer</th><th>Jatuh Tempo</th><th>Status</th><th>Total</th></tr></thead>
+    <tbody>
+      {% for inv in unpaid_invoices %}
+      <tr>
+        <td><a href="{% url 'finance:invoice_edit' inv.pk %}">{{ inv.number }}</a></td>
+        <td>{{ inv.customer|default:"-" }}</td>
+        <td>{{ inv.due_date }}</td>
+        <td>{{ inv.get_status_display|smart_badge }}</td>
+        <td>Rp {{ inv.total|floatformat:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center text-muted py-4">Tidak ada invoice belum lunas.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+new Chart(document.getElementById('incomeExpenseChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ month_labels|safe }},
+    datasets: [
+      { label: 'Income', data: {{ income_series|safe }}, backgroundColor: '#16a34a', borderRadius: 4 },
+      { label: 'Expense', data: {{ expense_series|safe }}, backgroundColor: '#dc3545', borderRadius: 4 },
+    ],
+  },
+  options: { responsive: true },
+});
+</script>
+{% endblock %}
