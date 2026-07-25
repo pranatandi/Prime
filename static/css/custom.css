@@ -1,0 +1,46 @@
+:root {
+  --sidebar-width: 220px;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: 100vh;
+}
+
+.sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.25rem;
+}
+
+.main-content {
+  padding: 1.5rem;
+}
+
+.kanban-board {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+}
+
+.kanban-column {
+  min-width: 260px;
+  flex: 1;
+}
+
+.kanban-card {
+  cursor: grab;
+}
+
+.stat-card {
+  border-left: 4px solid var(--bs-primary);
+}

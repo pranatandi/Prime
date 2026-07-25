@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Deals / Pipeline{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Sales Pipeline</h3>
+  <div>
+    <a href="{% url 'crm:stage_list' %}" class="btn btn-outline-secondary">Kelola Stage</a>
+    <a href="{% url 'crm:deal_create' %}" class="btn btn-primary">+ Tambah Deal</a>
+  </div>
+</div>
+
+{% if not stages %}
+  <div class="alert alert-warning">
+    Belum ada Pipeline Stage. <a href="{% url 'crm:stage_create' %}">Buat stage pertama</a> (mis. New, Qualified, Proposal, Negotiation, Won, Lost).
+  </div>
+{% else %}
+<div class="kanban-board">
+  {% for stage in stages %}
+  <div class="kanban-column">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between">
+        <strong>{{ stage.name }}</strong>
+        <span class="badge bg-secondary">{{ stage.deals.count }}</span>
+      </div>
+      <div class="card-body p-2 drop-zone" data-stage-id="{{ stage.id }}" style="min-height: 200px;">
+        {% for deal in stage.deals.all %}
+        <div class="card kanban-card mb-2" draggable="true" data-deal-id="{{ deal.id }}">
+          <div class="card-body p-2">
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'crm:deal_edit' deal.pk %}">{{ deal.title }}</a>
+            </div>
+            <div class="small text-muted">{{ deal.company|default:"-" }}</div>
+            <div class="fw-bold">Rp {{ deal.value|floatformat:0 }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  let draggedId = null;
+  document.querySelectorAll('.kanban-card').forEach(function (card) {
+    card.addEventListener('dragstart', function () {
+      draggedId = card.dataset.dealId;
+    });
+  });
+  document.querySelectorAll('.drop-zone').forEach(function (zone) {
+    zone.addEventListener('dragover', function (e) { e.preventDefault(); });
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      if (!draggedId) return;
+      const stageId = zone.dataset.stageId;
+      fetch(`/crm/deals/${draggedId}/move/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: JSON.stringify({ stage_id: stageId }),
+      }).then(function (res) {
+        if (res.ok) { window.location.reload(); }
+      });
+    });
+  });
+});
+</script>
+{% endblock %}

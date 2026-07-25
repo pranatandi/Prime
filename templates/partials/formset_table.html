@@ -1,0 +1,32 @@
+{{ formset.management_form }}
+{% if formset.non_form_errors %}
+  <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+{% endif %}
+<div class="table-responsive">
+<table class="table table-sm align-middle">
+  <thead>
+    <tr>
+      {% for field in formset.empty_form %}
+        {% if field.name != 'DELETE' and field.name != 'id' %}<th>{{ field.label }}</th>{% endif %}
+      {% endfor %}
+      <th>Hapus</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for form in formset %}
+    <tr>
+      {{ form.id }}
+      {% for field in form %}
+        {% if field.name != 'DELETE' and field.name != 'id' %}
+        <td>
+          {{ field }}
+          {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </td>
+        {% endif %}
+      {% endfor %}
+      <td class="text-center">{{ form.DELETE }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
