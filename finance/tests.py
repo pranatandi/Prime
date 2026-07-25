@@ -31,6 +31,19 @@ class InvoiceTotalTests(TestCase):
         self.assertEqual(self.invoice.subtotal, Decimal("0"))
         self.assertEqual(self.invoice.total, Decimal("0"))
 
+    def test_total_idr_with_foreign_currency(self):
+        InvoiceItem.objects.create(invoice=self.invoice, description="Item", quantity=1, unit_price=Decimal("100"))
+        self.invoice.currency = "USD"
+        self.invoice.exchange_rate = Decimal("15000")
+        self.invoice.save()
+        self.assertEqual(self.invoice.total, Decimal("100"))
+        self.assertEqual(self.invoice.total_idr, Decimal("1500000"))
+
+    def test_total_idr_defaults_to_total_for_idr(self):
+        InvoiceItem.objects.create(invoice=self.invoice, description="Item", quantity=1, unit_price=Decimal("50000"))
+        self.assertEqual(self.invoice.currency, "IDR")
+        self.assertEqual(self.invoice.total_idr, self.invoice.total)
+
 
 class PaymentTests(TestCase):
     def setUp(self):

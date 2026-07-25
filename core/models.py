@@ -37,6 +37,22 @@ class TenantScopedModel(models.Model):
         abstract = True
 
 
+class Currency(models.TextChoices):
+    """Shared currency list for documents that support a foreign-currency
+    amount + exchange rate to the base currency (IDR). The general ledger
+    itself (JournalEntry/Payment) always stays in IDR.
+    """
+
+    IDR = "IDR", "IDR - Rupiah"
+    USD = "USD", "USD - US Dollar"
+    EUR = "EUR", "EUR - Euro"
+    SGD = "SGD", "SGD - Singapore Dollar"
+    JPY = "JPY", "JPY - Japanese Yen"
+    CNY = "CNY", "CNY - Chinese Yuan"
+    AUD = "AUD", "AUD - Australian Dollar"
+    GBP = "GBP", "GBP - British Pound"
+
+
 class AuditLog(models.Model):
     class Action(models.TextChoices):
         CREATE = "CREATE", "Created"

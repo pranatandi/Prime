@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load crm_extras %}
+{% block title %}Fixed Assets{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><i class="bi bi-building-gear me-2 text-muted"></i>Fixed Assets</h3>
+  <div class="d-flex gap-2">
+    <a href="{% url 'assets:fixedasset_export' %}" class="btn btn-outline-secondary"><i class="bi bi-download"></i>Export CSV</a>
+    <form method="post" action="{% url 'assets:fixedasset_run_depreciation' %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-primary"><i class="bi bi-calculator"></i>Posting Penyusutan Bulan Ini (Semua)</button>
+    </form>
+    <a href="{% url 'assets:fixedasset_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i>Tambah Fixed Asset</a>
+  </div>
+</div>
+<div class="card">
+  <table class="table table-hover mb-0 align-middle">
+    <thead>
+      <tr><th>No. Aset</th><th>Nama</th><th>Tgl Perolehan</th><th>Harga Perolehan</th><th>Nilai Buku</th><th>Status</th><th class="text-end">Aksi</th></tr>
+    </thead>
+    <tbody>
+      {% for asset in object_list %}
+      <tr>
+        <td>{{ asset.asset_number }}</td>
+        <td>{{ asset.name }}</td>
+        <td>{{ asset.acquisition_date }}</td>
+        <td>Rp {{ asset.acquisition_cost|floatformat:0 }}</td>
+        <td>Rp {{ asset.book_value|floatformat:0 }}</td>
+        <td>{{ asset.get_status_display|smart_badge }}</td>
+        <td class="text-end">
+          <a href="{% url 'assets:fixedasset_detail' asset.pk %}" class="btn btn-sm btn-outline-primary" title="Detail"><i class="bi bi-eye"></i></a>
+          <a href="{% url 'assets:fixedasset_edit' asset.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+          <a href="{% url 'assets:fixedasset_delete' asset.pk %}" class="btn btn-sm btn-outline-danger" title="Hapus"><i class="bi bi-trash"></i></a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7">
+        <div class="empty-state"><i class="bi bi-building-gear"></i>Belum ada fixed asset.</div>
+      </td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -52,7 +52,7 @@ JournalEntryLineFormSet = inlineformset_factory(
 class InvoiceForm(BootstrapModelForm):
     class Meta:
         model = Invoice
-        fields = ["number", "customer", "issue_date", "due_date", "status"]
+        fields = ["number", "customer", "issue_date", "due_date", "status", "currency", "exchange_rate"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

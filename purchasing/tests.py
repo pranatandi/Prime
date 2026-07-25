@@ -88,6 +88,13 @@ class BillPaymentTests(TestCase):
         self.assertEqual(self.bill.amount_paid, Decimal("100000"))
         self.assertEqual(self.bill.balance_due, Decimal("0"))
 
+    def test_total_idr_with_foreign_currency(self):
+        self.bill.currency = "USD"
+        self.bill.exchange_rate = Decimal("15000")
+        self.bill.save()
+        self.assertEqual(self.bill.total, Decimal("100000"))
+        self.assertEqual(self.bill.total_idr, Decimal("1500000000"))
+
 
 class PurchaseOrderTenantIsolationTests(TestCase):
     def setUp(self):

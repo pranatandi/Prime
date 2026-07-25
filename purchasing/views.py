@@ -178,7 +178,8 @@ class BillListView(GenericTenantListView):
     has_export = True
     list_fields = [
         ("No.", "number"), ("Vendor", "vendor"), ("Jatuh Tempo", "due_date"),
-        ("Status", "get_status_display"), ("Total", "total"), ("Sisa Hutang", "balance_due"),
+        ("Status", "get_status_display"), ("Mata Uang", "currency"), ("Total", "total"),
+        ("Total (IDR)", "total_idr"), ("Sisa Hutang", "balance_due"),
     ]
 
     def get_queryset(self):
@@ -234,7 +235,8 @@ class BillExportView(TenantCSVExportView):
     filename = "bills"
     export_fields = [
         ("No.", "number"), ("Vendor", "vendor"), ("Tgl Bill", "bill_date"), ("Jatuh Tempo", "due_date"),
-        ("Status", "get_status_display"), ("Total", "total"), ("Sisa Hutang", "balance_due"),
+        ("Status", "get_status_display"), ("Mata Uang", "currency"), ("Total", "total"),
+        ("Total (IDR)", "total_idr"), ("Sisa Hutang", "balance_due"),
     ]
 
     def get_queryset(self):

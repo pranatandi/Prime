@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.db import models
 
-from core.models import TenantScopedModel
+from core.models import Currency, TenantScopedModel
 from finance.models import Payment, TaxRate
 from inventory.models import Product, Warehouse
 
@@ -78,6 +78,11 @@ class Bill(TenantScopedModel):
     bill_date = models.DateField()
     due_date = models.DateField()
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.DRAFT)
+    currency = models.CharField(max_length=3, choices=Currency.choices, default=Currency.IDR)
+    exchange_rate = models.DecimalField(
+        max_digits=14, decimal_places=4, default=1,
+        help_text="Kurs ke IDR pada tanggal transaksi. Biarkan 1 untuk bill dalam IDR.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -100,6 +105,10 @@ class Bill(TenantScopedModel):
     @property
     def total(self):
         return self.subtotal + self.tax_total
+
+    @property
+    def total_idr(self):
+        return self.total * self.exchange_rate
 
     @property
     def amount_paid(self):

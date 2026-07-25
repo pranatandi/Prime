@@ -7,6 +7,7 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         from core.signals import connect_audit_log
+        from assets.models import FixedAsset
         from crm.models import Activity, Company, Contact, Deal
         from finance.models import Account, BankAccount, Budget, Invoice, JournalEntry, Payment
         from inventory.models import Product
@@ -19,5 +20,5 @@ class CoreConfig(AppConfig):
             Account, JournalEntry, Invoice, Budget, BankAccount, Payment,
             Employee, PayrollRun,
             Vendor, PurchaseOrder, Bill,
-            Product, SalesOrder,
+            Product, SalesOrder, FixedAsset,
         ])

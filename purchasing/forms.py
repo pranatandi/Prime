@@ -60,7 +60,7 @@ class PurchaseOrderReceiveForm(forms.Form):
 class BillForm(BootstrapModelForm):
     class Meta:
         model = Bill
-        fields = ["number", "vendor", "purchase_order", "bill_date", "due_date", "status"]
+        fields = ["number", "vendor", "purchase_order", "bill_date", "due_date", "status", "currency", "exchange_rate"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
