@@ -2,7 +2,8 @@ from django.forms import inlineformset_factory
 
 from core.forms import BootstrapModelForm
 from .models import (
-    Account, Budget, BudgetLine, Invoice, InvoiceItem, JournalEntry, JournalEntryLine, TaxRate,
+    Account, BankAccount, Budget, BudgetLine, Invoice, InvoiceItem, JournalEntry,
+    JournalEntryLine, Payment, TaxRate,
 )
 
 
@@ -99,3 +100,27 @@ class BudgetLineForm(BootstrapModelForm):
 BudgetLineFormSet = inlineformset_factory(
     Budget, BudgetLine, form=BudgetLineForm, extra=2, can_delete=True,
 )
+
+
+class BankAccountForm(BootstrapModelForm):
+    class Meta:
+        model = BankAccount
+        fields = ["name", "account", "bank_name", "account_number", "is_cash", "opening_balance"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["account"].queryset = Account.objects.filter(tenant=self.tenant, type=Account.AccountType.ASSET)
+
+
+class PaymentForm(BootstrapModelForm):
+    class Meta:
+        model = Payment
+        fields = ["bank_account", "direction", "date", "amount", "contra_account", "invoice", "memo"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["bank_account"].queryset = BankAccount.objects.filter(tenant=self.tenant)
+        self.fields["contra_account"].queryset = Account.objects.filter(tenant=self.tenant)
+        self.fields["invoice"].queryset = Invoice.objects.filter(tenant=self.tenant)
+        self.fields["invoice"].required = False
+        self.fields["date"].widget.attrs["type"] = "date"

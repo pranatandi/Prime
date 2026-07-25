@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Rekonsiliasi - {{ bank_account.name }}{% endblock %}
+{% block breadcrumb %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'finance:bankaccount_list' %}">Bank Accounts</a></li>
+  <li class="breadcrumb-item active">Rekonsiliasi {{ bank_account.name }}</li>
+</ol></nav>
+{% endblock %}
+{% block content %}
+<h3 class="mb-3">Rekonsiliasi Bank - {{ bank_account.name }}</h3>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Saldo Buku (Book Balance)</div>
+        <div class="fs-4 fw-bold">Rp {{ bank_account.book_balance|floatformat:0 }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Saldo Reconciled</div>
+        <div class="fs-4 fw-bold">Rp {{ bank_account.reconciled_balance|floatformat:0 }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Selisih</div>
+        <div class="fs-4 fw-bold">Rp {{ difference|floatformat:0 }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="card shadow-sm">
+    <table class="table mb-0 align-middle">
+      <thead class="table-light">
+        <tr><th>Reconciled?</th><th>Tanggal</th><th>Arah</th><th>Jumlah</th><th>Akun Lawan</th><th>Memo</th></tr>
+      </thead>
+      <tbody>
+        {% for payment in payments %}
+        <tr>
+          <td><input type="checkbox" name="reconciled" value="{{ payment.pk }}" class="form-check-input" {% if payment.is_reconciled %}checked{% endif %}></td>
+          <td>{{ payment.date }}</td>
+          <td>{{ payment.get_direction_display }}</td>
+          <td>Rp {{ payment.amount|floatformat:0 }}</td>
+          <td>{{ payment.contra_account }}</td>
+          <td>{{ payment.memo }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">Belum ada payment untuk bank/kas ini.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <button type="submit" class="btn btn-primary mt-3">Simpan Rekonsiliasi</button>
+  <a href="{% url 'finance:bankaccount_list' %}" class="btn btn-outline-secondary mt-3">Kembali</a>
+</form>
+{% endblock %}

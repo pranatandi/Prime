@@ -1,7 +1,10 @@
 from django.contrib import admin
 
 from core.admin import TenantScopedAdmin
-from .models import Account, Budget, BudgetLine, Invoice, InvoiceItem, JournalEntry, JournalEntryLine, TaxRate
+from .models import (
+    Account, BankAccount, Budget, BudgetLine, Invoice, InvoiceItem, JournalEntry,
+    JournalEntryLine, Payment, TaxRate,
+)
 
 
 class JournalEntryLineInline(admin.TabularInline):
@@ -52,3 +55,15 @@ class BudgetAdmin(TenantScopedAdmin):
     list_display = ("name", "fiscal_year", "period", "total_planned", "tenant")
     list_filter = ("tenant", "period")
     inlines = [BudgetLineInline]
+
+
+@admin.register(BankAccount)
+class BankAccountAdmin(TenantScopedAdmin):
+    list_display = ("name", "bank_name", "account_number", "is_cash", "book_balance", "tenant")
+    list_filter = ("tenant", "is_cash")
+
+
+@admin.register(Payment)
+class PaymentAdmin(TenantScopedAdmin):
+    list_display = ("date", "bank_account", "direction", "amount", "contra_account", "invoice", "is_reconciled", "tenant")
+    list_filter = ("tenant", "direction", "is_reconciled")

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Bank Accounts{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Bank Accounts</h3>
+  <a href="{% url 'finance:bankaccount_create' %}" class="btn btn-primary">+ Tambah Bank Account</a>
+</div>
+<div class="card shadow-sm">
+  <table class="table table-hover mb-0 align-middle">
+    <thead class="table-light">
+      <tr><th>Nama</th><th>Bank</th><th>No. Rekening</th><th>Kas?</th><th>Saldo Buku</th><th class="text-end">Aksi</th></tr>
+    </thead>
+    <tbody>
+      {% for obj in object_list %}
+      <tr>
+        <td>{{ obj.name }}</td>
+        <td>{{ obj.bank_name }}</td>
+        <td>{{ obj.account_number }}</td>
+        <td>{{ obj.is_cash }}</td>
+        <td>Rp {{ obj.book_balance|floatformat:0 }}</td>
+        <td class="text-end">
+          <a href="{% url 'finance:bankaccount_reconcile' obj.pk %}" class="btn btn-sm btn-outline-primary">Rekonsiliasi</a>
+          <a href="{% url 'finance:bankaccount_edit' obj.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+          <a href="{% url 'finance:bankaccount_delete' obj.pk %}" class="btn btn-sm btn-outline-danger">Hapus</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-center text-muted py-4">Belum ada bank account.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

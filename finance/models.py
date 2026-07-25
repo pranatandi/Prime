@@ -108,6 +108,16 @@ class Invoice(TenantScopedModel):
     def total(self):
         return self.subtotal + self.tax_total
 
+    @property
+    def amount_paid(self):
+        return sum(
+            (p.amount for p in self.payments.filter(direction=Payment.Direction.IN)), Decimal("0")
+        )
+
+    @property
+    def balance_due(self):
+        return self.total - self.amount_paid
+
 
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="items")
@@ -161,3 +171,81 @@ class BudgetLine(models.Model):
 
     def __str__(self):
         return f"{self.account} - {self.planned_amount}"
+
+
+class BankAccount(TenantScopedModel):
+    name = models.CharField(max_length=150)
+    account = models.OneToOneField(Account, on_delete=models.PROTECT, related_name="bank_account")
+    bank_name = models.CharField(max_length=100, blank=True)
+    account_number = models.CharField(max_length=50, blank=True)
+    is_cash = models.BooleanField(default=False, help_text="Centang untuk kas tunai (bukan rekening bank).")
+    opening_balance = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def book_balance(self):
+        lines = JournalEntryLine.objects.filter(entry__tenant=self.tenant, account=self.account)
+        totals = lines.aggregate(debit=models.Sum("debit"), credit=models.Sum("credit"))
+        debit = totals["debit"] or Decimal("0")
+        credit = totals["credit"] or Decimal("0")
+        return self.opening_balance + debit - credit
+
+    @property
+    def reconciled_balance(self):
+        payments = self.payments.filter(is_reconciled=True)
+        total_in = sum((p.amount for p in payments.filter(direction=Payment.Direction.IN)), Decimal("0"))
+        total_out = sum((p.amount for p in payments.filter(direction=Payment.Direction.OUT)), Decimal("0"))
+        return self.opening_balance + total_in - total_out
+
+
+class Payment(TenantScopedModel):
+    class Direction(models.TextChoices):
+        IN = "IN", "Uang Masuk"
+        OUT = "OUT", "Uang Keluar"
+
+    bank_account = models.ForeignKey(BankAccount, on_delete=models.PROTECT, related_name="payments")
+    contra_account = models.ForeignKey(
+        Account, on_delete=models.PROTECT, related_name="+",
+        help_text="Akun lawan, mis. Piutang Usaha (pembayaran customer) atau Beban (pengeluaran).",
+    )
+    direction = models.CharField(max_length=3, choices=Direction.choices)
+    date = models.DateField()
+    amount = models.DecimalField(max_digits=14, decimal_places=2)
+    invoice = models.ForeignKey(Invoice, on_delete=models.SET_NULL, null=True, blank=True, related_name="payments")
+    memo = models.CharField(max_length=255, blank=True)
+    is_reconciled = models.BooleanField(default=False)
+    reconciled_at = models.DateTimeField(null=True, blank=True)
+    journal_entry = models.ForeignKey(JournalEntry, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-date", "-id"]
+
+    def __str__(self):
+        return f"{self.get_direction_display()} Rp{self.amount} - {self.bank_account}"
+
+    def save(self, *args, **kwargs):
+        creating = self._state.adding
+        super().save(*args, **kwargs)
+        if creating and not self.journal_entry_id:
+            self._post_journal_entry()
+
+    def _post_journal_entry(self):
+        label = self.memo or f"Pembayaran {self.get_direction_display()}"
+        entry = JournalEntry.objects.create(
+            tenant=self.tenant, date=self.date, memo=f"{label} ({self.bank_account.name})",
+        )
+        if self.direction == self.Direction.IN:
+            JournalEntryLine.objects.create(entry=entry, account=self.bank_account.account, debit=self.amount)
+            JournalEntryLine.objects.create(entry=entry, account=self.contra_account, credit=self.amount)
+        else:
+            JournalEntryLine.objects.create(entry=entry, account=self.bank_account.account, credit=self.amount)
+            JournalEntryLine.objects.create(entry=entry, account=self.contra_account, debit=self.amount)
+        Payment.objects.filter(pk=self.pk).update(journal_entry=entry)
+        self.journal_entry = entry

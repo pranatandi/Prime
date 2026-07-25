@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Neraca{% endblock %}
+{% block breadcrumb %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}">Dashboard</a></li>
+  <li class="breadcrumb-item">Laporan Keuangan</li>
+  <li class="breadcrumb-item active">Neraca</li>
+</ol></nav>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Neraca (Balance Sheet)</h3>
+  <form method="get" class="d-flex gap-2">
+    <input type="date" name="as_of" value="{{ as_of }}" class="form-control form-control-sm">
+    <button type="submit" class="btn btn-sm btn-outline-primary">Tampilkan</button>
+  </form>
+</div>
+<p class="text-muted">Per tanggal {{ as_of }}</p>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold">Aset (Assets)</div>
+      <table class="table mb-0">
+        <tbody>
+          {% for row in assets %}
+          <tr><td>{{ row.code }} - {{ row.name }}</td><td class="text-end">Rp {{ row.balance|floatformat:0 }}</td></tr>
+          {% empty %}<tr><td colspan="2" class="text-muted text-center py-3">Belum ada transaksi.</td></tr>{% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="table-light fw-bold"><td>Total Aset</td><td class="text-end">Rp {{ total_assets|floatformat:0 }}</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header fw-bold">Liabilitas (Liabilities)</div>
+      <table class="table mb-0">
+        <tbody>
+          {% for row in liabilities %}
+          <tr><td>{{ row.code }} - {{ row.name }}</td><td class="text-end">Rp {{ row.balance|floatformat:0 }}</td></tr>
+          {% empty %}<tr><td colspan="2" class="text-muted text-center py-3">Belum ada transaksi.</td></tr>{% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="table-light fw-bold"><td>Total Liabilitas</td><td class="text-end">Rp {{ total_liabilities|floatformat:0 }}</td></tr>
+        </tfoot>
+      </table>
+    </div>
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold">Ekuitas (Equity)</div>
+      <table class="table mb-0">
+        <tbody>
+          {% for row in equity %}
+          <tr><td>{{ row.code }} - {{ row.name }}</td><td class="text-end">Rp {{ row.balance|floatformat:0 }}</td></tr>
+          {% endfor %}
+          <tr><td>Laba Ditahan Tahun Berjalan</td><td class="text-end">Rp {{ current_earnings|floatformat:0 }}</td></tr>
+        </tbody>
+        <tfoot>
+          <tr class="table-light fw-bold"><td>Total Ekuitas</td><td class="text-end">Rp {{ total_equity_with_earnings|floatformat:0 }}</td></tr>
+          <tr class="fw-bold border-top border-2"><td>Total Liabilitas + Ekuitas</td><td class="text-end">Rp {{ total_liabilities_equity|floatformat:0 }}</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% if total_assets != total_liabilities_equity %}
+<div class="alert alert-warning mt-3">
+  Neraca belum balance (Aset Rp {{ total_assets|floatformat:0 }} vs Liabilitas+Ekuitas Rp {{ total_liabilities_equity|floatformat:0 }}).
+  Periksa kembali jurnal entry Anda.
+</div>
+{% endif %}
+{% endblock %}
