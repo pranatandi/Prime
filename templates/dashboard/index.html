@@ -8,38 +8,50 @@
 
 <div class="row g-3 mb-4">
   <div class="col-md-3">
-    <div class="card stat-card shadow-sm h-100">
-      <div class="card-body">
-        <div class="text-muted small">Open Deals</div>
-        <div class="fs-4 fw-bold">{{ open_deal_count }}</div>
-        <div class="text-muted">Rp {{ open_deal_total|floatformat:0 }}</div>
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex gap-3 align-items-start">
+        <div class="stat-icon"><i class="bi bi-kanban"></i></div>
+        <div>
+          <div class="text-muted small">Open Deals</div>
+          <div class="fs-4 fw-bold">{{ open_deal_count }}</div>
+          <div class="text-muted small">Rp {{ open_deal_total|floatformat:0 }}</div>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-md-3">
-    <div class="card stat-card shadow-sm h-100">
-      <div class="card-body">
-        <div class="text-muted small">Won Bulan Ini</div>
-        <div class="fs-4 fw-bold">{{ won_deal_count }}</div>
-        <div class="text-muted">Rp {{ won_deal_total|floatformat:0 }}</div>
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex gap-3 align-items-start">
+        <div class="stat-icon" style="background-color:#ecfdf3; color:#16a34a;"><i class="bi bi-trophy"></i></div>
+        <div>
+          <div class="text-muted small">Won Bulan Ini</div>
+          <div class="fs-4 fw-bold">{{ won_deal_count }}</div>
+          <div class="text-muted small">Rp {{ won_deal_total|floatformat:0 }}</div>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-md-3">
-    <div class="card stat-card shadow-sm h-100">
-      <div class="card-body">
-        <div class="text-muted small">Revenue Bulan Ini</div>
-        <div class="fs-4 fw-bold">Rp {{ revenue_this_month|floatformat:0 }}</div>
-        <div class="text-muted">dari invoice paid</div>
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex gap-3 align-items-start">
+        <div class="stat-icon" style="background-color:#ecfdf3; color:#16a34a;"><i class="bi bi-graph-up-arrow"></i></div>
+        <div>
+          <div class="text-muted small">Revenue Bulan Ini</div>
+          <div class="fs-4 fw-bold">Rp {{ revenue_this_month|floatformat:0 }}</div>
+          <div class="text-muted small">dari invoice paid</div>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-md-3">
-    <div class="card stat-card shadow-sm h-100">
-      <div class="card-body">
-        <div class="text-muted small">Expense Bulan Ini</div>
-        <div class="fs-4 fw-bold">Rp {{ expense_this_month|floatformat:0 }}</div>
-        <div class="text-muted">dari journal entries</div>
+    <div class="card stat-card h-100">
+      <div class="card-body d-flex gap-3 align-items-start">
+        <div class="stat-icon" style="background-color:#fef2f2; color:#dc3545;"><i class="bi bi-graph-down-arrow"></i></div>
+        <div>
+          <div class="text-muted small">Expense Bulan Ini</div>
+          <div class="fs-4 fw-bold">Rp {{ expense_this_month|floatformat:0 }}</div>
+          <div class="text-muted small">dari journal entries</div>
+        </div>
       </div>
     </div>
   </div>
@@ -47,18 +59,18 @@
 
 <div class="row g-3">
   <div class="col-md-7">
-    <div class="card shadow-sm h-100">
-      <div class="card-header">Pipeline Funnel (Open Deals)</div>
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-bar-chart-line me-2"></i>Pipeline Funnel (Open Deals)</div>
       <div class="card-body">
         <canvas id="funnelChart" height="120"></canvas>
       </div>
     </div>
   </div>
   <div class="col-md-5">
-    <div class="card shadow-sm h-100">
-      <div class="card-header d-flex justify-content-between">
-        <span>Tasks Jatuh Tempo Hari Ini</span>
-        {% if overdue_tasks %}<span class="badge bg-danger">{{ overdue_tasks }} overdue</span>{% endif %}
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-check2-square me-2"></i>Tasks Jatuh Tempo Hari Ini</span>
+        {% if overdue_tasks %}<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis">{{ overdue_tasks }} overdue</span>{% endif %}
       </div>
       <ul class="list-group list-group-flush">
         {% for task in tasks_due_today %}
@@ -67,7 +79,7 @@
           <span class="text-muted small">{{ task.assigned_to|default:"-" }}</span>
         </li>
         {% empty %}
-        <li class="list-group-item text-muted">Tidak ada task jatuh tempo hari ini.</li>
+        <li class="list-group-item text-muted small">Tidak ada task jatuh tempo hari ini.</li>
         {% endfor %}
       </ul>
     </div>
@@ -84,7 +96,8 @@ new Chart(document.getElementById('funnelChart'), {
     datasets: [{
       label: 'Nilai Deal (Open)',
       data: {{ funnel_values|safe }},
-      backgroundColor: '#0d6efd',
+      backgroundColor: '#4f46e5',
+      borderRadius: 6,
     }],
   },
   options: { responsive: true, plugins: { legend: { display: false } } },

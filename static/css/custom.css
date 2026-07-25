@@ -1,29 +1,114 @@
+/* ---------------------------------------------------------------------
+   Prime design system — layered on top of Bootstrap 5.3.
+--------------------------------------------------------------------- */
+
 :root {
-  --sidebar-width: 220px;
+  --sidebar-width: 250px;
+  --brand: #4f46e5;
+  --brand-dark: #4338ca;
+  --brand-tint: #eef2ff;
+  --surface: #ffffff;
+  --app-bg: #f7f8fb;
+  --border-soft: #e7e8f0;
+  --text-muted-soft: #6b7280;
+  --radius: 0.75rem;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+
+  --bs-primary: var(--brand);
+  --bs-primary-rgb: 79, 70, 229;
+  --bs-link-color: var(--brand);
+  --bs-link-hover-color: var(--brand-dark);
 }
 
 body {
   min-height: 100vh;
+  background-color: var(--app-bg);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1f2333;
 }
+
+.btn-primary {
+  background-color: var(--brand);
+  border-color: var(--brand);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--brand-dark);
+  border-color: var(--brand-dark);
+}
+
+.btn-outline-primary {
+  color: var(--brand);
+  border-color: var(--brand);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--brand);
+  border-color: var(--brand);
+}
+
+.btn i,
+.nav-link i,
+.dropdown-item i {
+  margin-right: 0.4rem;
+}
+
+/* ---------------------------------------------------------------------
+   Sidebar
+--------------------------------------------------------------------- */
 
 .sidebar {
   width: var(--sidebar-width);
   min-height: 100vh;
+  background-color: var(--surface) !important;
+  border-right: 1px solid var(--border-soft);
+  transition: transform 0.2s ease;
+}
+
+.sidebar .brand-mark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, var(--brand), #7c6cf0);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .sidebar .nav-link {
-  color: rgba(255, 255, 255, 0.75);
+  color: #4b5069;
+  font-size: 0.92rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.5rem;
+  border-left: 3px solid transparent;
 }
 
-.sidebar .nav-link.active,
 .sidebar .nav-link:hover {
-  color: #fff;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 0.25rem;
+  color: var(--brand);
+  background-color: var(--brand-tint);
+}
+
+.sidebar .nav-link.active {
+  color: var(--brand);
+  background-color: var(--brand-tint);
+  border-left-color: var(--brand);
+  font-weight: 600;
 }
 
 .sidebar-group-toggle {
   cursor: pointer;
+  color: #9095a8 !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.sidebar-group-toggle:hover {
+  color: var(--brand) !important;
 }
 
 .sidebar-group-toggle .collapse-caret {
@@ -34,29 +119,213 @@ body {
   transform: rotate(-90deg);
 }
 
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 17, 30, 0.35);
+  z-index: 1030;
+}
+
+.sidebar-toggle-btn {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .sidebar {
+    position: fixed;
+    z-index: 1040;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+  }
+
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+    box-shadow: var(--shadow-md);
+  }
+
+  body.sidebar-open .sidebar-backdrop {
+    display: block;
+  }
+
+  .sidebar-toggle-btn {
+    display: inline-flex;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Top navbar
+--------------------------------------------------------------------- */
+
+.topbar {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.topbar .search-box {
+  position: relative;
+}
+
+.topbar .search-box .bi-search {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted-soft);
+}
+
+.topbar .search-box input {
+  padding-left: 2.1rem;
+  background-color: var(--app-bg);
+  border-color: var(--border-soft);
+}
+
+.avatar-circle {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: var(--brand-tint);
+  color: var(--brand);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.notif-bell {
+  position: relative;
+}
+
+.notif-bell .badge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.4rem;
+  font-size: 0.65rem;
+}
+
+/* ---------------------------------------------------------------------
+   Layout / cards / tables
+--------------------------------------------------------------------- */
+
 .main-content {
-  padding: 1.5rem;
+  padding: 1.75rem;
 }
 
 .breadcrumb {
   margin-bottom: 1rem;
+  font-size: 0.85rem;
 }
+
+.card {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+  font-weight: 600;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted-soft);
+  border-bottom-width: 1px;
+}
+
+.table > :not(caption) > * > * {
+  padding: 0.85rem 1rem;
+}
+
+.table-hover > tbody > tr:hover > * {
+  background-color: var(--brand-tint);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted-soft);
+}
+
+.empty-state i {
+  font-size: 2rem;
+  color: #c7c9d9;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* ---------------------------------------------------------------------
+   Kanban board
+--------------------------------------------------------------------- */
 
 .kanban-board {
   display: flex;
   gap: 1rem;
   overflow-x: auto;
+  padding-bottom: 0.5rem;
 }
 
 .kanban-column {
-  min-width: 260px;
+  min-width: 270px;
   flex: 1;
+}
+
+.kanban-column .card-header {
+  background-color: var(--app-bg);
 }
 
 .kanban-card {
   cursor: grab;
+  border-radius: 0.6rem;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
+.kanban-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.kanban-card.dragging {
+  opacity: 0.5;
+}
+
+/* ---------------------------------------------------------------------
+   Stat cards / auth pages
+--------------------------------------------------------------------- */
+
 .stat-card {
-  border-left: 4px solid var(--bs-primary);
+  border-left: 4px solid var(--brand);
+}
+
+.stat-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.6rem;
+  background-color: var(--brand-tint);
+  color: var(--brand);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.auth-shell {
+  min-height: 100vh;
+  background: linear-gradient(160deg, var(--brand) 0%, #7c6cf0 55%, #a78bfa 100%);
+}
+
+.auth-card {
+  border: none;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-md);
 }

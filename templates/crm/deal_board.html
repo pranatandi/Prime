@@ -2,38 +2,41 @@
 {% block title %}Deals / Pipeline{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0">Sales Pipeline</h3>
-  <div>
-    <a href="{% url 'crm:deal_export' %}" class="btn btn-outline-secondary">Export CSV</a>
-    <a href="{% url 'crm:stage_list' %}" class="btn btn-outline-secondary">Kelola Stage</a>
-    <a href="{% url 'crm:deal_create' %}" class="btn btn-primary">+ Tambah Deal</a>
+  <h3 class="mb-0"><i class="bi bi-kanban me-2 text-muted"></i>Sales Pipeline</h3>
+  <div class="d-flex gap-2">
+    <a href="{% url 'crm:deal_export' %}" class="btn btn-outline-secondary"><i class="bi bi-download"></i>Export CSV</a>
+    <a href="{% url 'crm:stage_list' %}" class="btn btn-outline-secondary"><i class="bi bi-sliders"></i>Kelola Stage</a>
+    <a href="{% url 'crm:deal_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i>Tambah Deal</a>
   </div>
 </div>
 
 {% if not stages %}
-  <div class="alert alert-warning">
-    Belum ada Pipeline Stage. <a href="{% url 'crm:stage_create' %}">Buat stage pertama</a> (mis. New, Qualified, Proposal, Negotiation, Won, Lost).
+  <div class="alert alert-warning d-flex align-items-center gap-2">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <div>Belum ada Pipeline Stage. <a href="{% url 'crm:stage_create' %}">Buat stage pertama</a> (mis. New, Qualified, Proposal, Negotiation, Won, Lost).</div>
   </div>
 {% else %}
 <div class="kanban-board">
   {% for stage in stages %}
   <div class="kanban-column">
     <div class="card">
-      <div class="card-header d-flex justify-content-between">
+      <div class="card-header d-flex justify-content-between align-items-center">
         <strong>{{ stage.name }}</strong>
-        <span class="badge bg-secondary">{{ stage.deals.count }}</span>
+        <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis">{{ stage.deals.count }}</span>
       </div>
       <div class="card-body p-2 drop-zone" data-stage-id="{{ stage.id }}" style="min-height: 200px;">
         {% for deal in stage.deals.all %}
         <div class="card kanban-card mb-2" draggable="true" data-deal-id="{{ deal.id }}">
           <div class="card-body p-2">
             <div class="d-flex justify-content-between">
-              <a href="{% url 'crm:deal_edit' deal.pk %}">{{ deal.title }}</a>
+              <a href="{% url 'crm:deal_edit' deal.pk %}" class="text-decoration-none fw-medium">{{ deal.title }}</a>
             </div>
-            <div class="small text-muted">{{ deal.company|default:"-" }}</div>
-            <div class="fw-bold">Rp {{ deal.value|floatformat:0 }}</div>
+            <div class="small text-muted"><i class="bi bi-building"></i> {{ deal.company|default:"-" }}</div>
+            <div class="fw-bold text-primary">Rp {{ deal.value|floatformat:0 }}</div>
           </div>
         </div>
+        {% empty %}
+        <div class="text-center text-muted small py-4"><i class="bi bi-inbox d-block fs-4 mb-1"></i>Kosong</div>
         {% endfor %}
       </div>
     </div>
@@ -50,6 +53,10 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.kanban-card').forEach(function (card) {
     card.addEventListener('dragstart', function () {
       draggedId = card.dataset.dealId;
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragend', function () {
+      card.classList.remove('dragging');
     });
   });
   document.querySelectorAll('.drop-zone').forEach(function (zone) {

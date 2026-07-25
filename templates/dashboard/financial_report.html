@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crm_extras %}
 {% block title %}Financial Report{% endblock %}
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
@@ -11,18 +12,18 @@
 </ol></nav>
 {% endblock %}
 {% block content %}
-<h3 class="mb-4">Financial Report</h3>
+<h3 class="mb-4"><i class="bi bi-bar-chart-line me-2 text-muted"></i>Financial Report</h3>
 
 <div class="row g-3 mb-4">
   <div class="col-md-7">
-    <div class="card shadow-sm h-100">
-      <div class="card-header">Income vs Expense per Bulan (6 Bulan Terakhir)</div>
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-arrow-left-right me-2"></i>Income vs Expense per Bulan (6 Bulan Terakhir)</div>
       <div class="card-body"><canvas id="incomeExpenseChart" height="120"></canvas></div>
     </div>
   </div>
   <div class="col-md-5">
-    <div class="card shadow-sm h-100">
-      <div class="card-header">AR Aging (Invoice Belum Lunas)</div>
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-hourglass-split me-2"></i>AR Aging (Invoice Belum Lunas)</div>
       <table class="table mb-0">
         <tbody>
           {% for label, total in aging.items %}
@@ -37,17 +38,17 @@
   </div>
 </div>
 
-<div class="card shadow-sm">
-  <div class="card-header">Invoice Belum Lunas</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-receipt me-2"></i>Invoice Belum Lunas</div>
   <table class="table mb-0">
-    <thead class="table-light"><tr><th>No.</th><th>Customer</th><th>Jatuh Tempo</th><th>Status</th><th>Total</th></tr></thead>
+    <thead><tr><th>No.</th><th>Customer</th><th>Jatuh Tempo</th><th>Status</th><th>Total</th></tr></thead>
     <tbody>
       {% for inv in unpaid_invoices %}
       <tr>
         <td><a href="{% url 'finance:invoice_edit' inv.pk %}">{{ inv.number }}</a></td>
         <td>{{ inv.customer|default:"-" }}</td>
         <td>{{ inv.due_date }}</td>
-        <td>{{ inv.get_status_display }}</td>
+        <td>{{ inv.get_status_display|smart_badge }}</td>
         <td>Rp {{ inv.total|floatformat:0 }}</td>
       </tr>
       {% empty %}
@@ -65,8 +66,8 @@ new Chart(document.getElementById('incomeExpenseChart'), {
   data: {
     labels: {{ month_labels|safe }},
     datasets: [
-      { label: 'Income', data: {{ income_series|safe }}, backgroundColor: '#198754' },
-      { label: 'Expense', data: {{ expense_series|safe }}, backgroundColor: '#dc3545' },
+      { label: 'Income', data: {{ income_series|safe }}, backgroundColor: '#16a34a', borderRadius: 4 },
+      { label: 'Expense', data: {{ expense_series|safe }}, backgroundColor: '#dc3545', borderRadius: 4 },
     ],
   },
   options: { responsive: true },

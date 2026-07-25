@@ -9,7 +9,7 @@
 {% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0">Neraca (Balance Sheet)</h3>
+  <h3 class="mb-0"><i class="bi bi-clipboard-data me-2 text-muted"></i>Neraca (Balance Sheet)</h3>
   <form method="get" class="d-flex gap-2">
     <input type="date" name="as_of" value="{{ as_of }}" class="form-control form-control-sm">
     <button type="submit" class="btn btn-sm btn-outline-primary">Tampilkan</button>
@@ -19,8 +19,8 @@
 
 <div class="row g-3">
   <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-header fw-bold">Aset (Assets)</div>
+    <div class="card">
+      <div class="card-header fw-bold"><i class="bi bi-box-seam me-2"></i>Aset (Assets)</div>
       <table class="table mb-0">
         <tbody>
           {% for row in assets %}
@@ -34,8 +34,8 @@
     </div>
   </div>
   <div class="col-md-6">
-    <div class="card shadow-sm mb-3">
-      <div class="card-header fw-bold">Liabilitas (Liabilities)</div>
+    <div class="card mb-3">
+      <div class="card-header fw-bold"><i class="bi bi-credit-card me-2"></i>Liabilitas (Liabilities)</div>
       <table class="table mb-0">
         <tbody>
           {% for row in liabilities %}
@@ -47,8 +47,8 @@
         </tfoot>
       </table>
     </div>
-    <div class="card shadow-sm">
-      <div class="card-header fw-bold">Ekuitas (Equity)</div>
+    <div class="card">
+      <div class="card-header fw-bold"><i class="bi bi-pie-chart me-2"></i>Ekuitas (Equity)</div>
       <table class="table mb-0">
         <tbody>
           {% for row in equity %}
@@ -66,9 +66,9 @@
 </div>
 
 {% if total_assets != total_liabilities_equity %}
-<div class="alert alert-warning mt-3">
-  Neraca belum balance (Aset Rp {{ total_assets|floatformat:0 }} vs Liabilitas+Ekuitas Rp {{ total_liabilities_equity|floatformat:0 }}).
-  Periksa kembali jurnal entry Anda.
+<div class="alert alert-warning mt-3 d-flex align-items-center gap-2">
+  <i class="bi bi-exclamation-triangle-fill"></i>
+  <div>Neraca belum balance (Aset Rp {{ total_assets|floatformat:0 }} vs Liabilitas+Ekuitas Rp {{ total_liabilities_equity|floatformat:0 }}). Periksa kembali jurnal entry Anda.</div>
 </div>
 {% endif %}
 {% endblock %}

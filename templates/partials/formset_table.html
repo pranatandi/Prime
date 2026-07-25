@@ -1,6 +1,6 @@
 {{ formset.management_form }}
 {% if formset.non_form_errors %}
-  <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+  <div class="alert alert-danger d-flex align-items-center gap-2"><i class="bi bi-exclamation-triangle-fill"></i>{{ formset.non_form_errors }}</div>
 {% endif %}
 <div class="table-responsive">
 <table class="table table-sm align-middle">

@@ -7,11 +7,11 @@
 </ol></nav>
 {% endblock %}
 {% block content %}
-<h3 class="mb-4">Pengaturan Perusahaan</h3>
+<h3 class="mb-4"><i class="bi bi-gear me-2 text-muted"></i>Pengaturan Perusahaan</h3>
 
 <div class="row g-3">
   <div class="col-md-7">
-    <div class="card shadow-sm">
+    <div class="card">
       <div class="card-body">
         <form method="post" novalidate>
           {% csrf_token %}
@@ -22,19 +22,19 @@
             {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
           </div>
           {% endfor %}
-          <button type="submit" class="btn btn-primary">Simpan</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i>Simpan</button>
         </form>
       </div>
     </div>
   </div>
   <div class="col-md-5">
-    <div class="card shadow-sm">
+    <div class="card">
       <div class="card-header">Pengaturan Lain</div>
       <div class="list-group list-group-flush">
-        <a href="{% url 'accounts:user_list' %}" class="list-group-item list-group-item-action">Pengguna &amp; Role</a>
-        <a href="{% url 'crm:stage_list' %}" class="list-group-item list-group-item-action">Pipeline Stages</a>
-        <a href="{% url 'finance:taxrate_list' %}" class="list-group-item list-group-item-action">Tax Rates</a>
-        <a href="{% url 'accounts:auditlog_list' %}" class="list-group-item list-group-item-action">Audit Log</a>
+        <a href="{% url 'accounts:user_list' %}" class="list-group-item list-group-item-action"><i class="bi bi-person-gear me-2"></i>Pengguna &amp; Role</a>
+        <a href="{% url 'crm:stage_list' %}" class="list-group-item list-group-item-action"><i class="bi bi-kanban me-2"></i>Pipeline Stages</a>
+        <a href="{% url 'finance:taxrate_list' %}" class="list-group-item list-group-item-action"><i class="bi bi-percent me-2"></i>Tax Rates</a>
+        <a href="{% url 'accounts:auditlog_list' %}" class="list-group-item list-group-item-action"><i class="bi bi-shield-check me-2"></i>Audit Log</a>
       </div>
     </div>
   </div>
